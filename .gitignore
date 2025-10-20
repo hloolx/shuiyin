@@ -60,4 +60,19 @@ typings/
 # next.js build output
 .next
 
+# 编译产物 - CoffeeScript 编译生成的 JS 文件
 public/*.js
+
+# 如果使用 npm，可以忽略 pnpm 锁文件
+pnpm-lock.yaml
+
+# IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
