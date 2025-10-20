@@ -39,6 +39,8 @@ npm run serve  # 访问 http://localhost:8080
 
 本项目的 CDN 加速和安全保护由腾讯 EdgeOne 赞助 <mcreference link="https://github.com/hloolx/mini-cover-lsky/blob/main/README.md" index="0">0</mcreference>
 
+[![腾讯EdgeOne](https://edgeone.ai/favicon.ico)](https://www.tencentcloud.com/products/edgeone)
+
 [最佳亚洲 CDN、Edge 和安全解决方案 - 腾讯 EdgeOne](https://www.tencentcloud.com/products/edgeone)
 
 ---
