@@ -1,0 +1,45 @@
+{
+  "name": "shuiyin",
+  "version": "1.0.0",
+  "description": "批量图片水印工具 - 本地处理，隐私安全",
+  "main": "public/index.html",
+  "scripts": {
+    "build": "npx coffee -c -o public src",
+    "dev": "npx coffee -c -w -o public src",
+    "serve": "npx http-server public -p 8080"
+  },
+  "keywords": [
+    "watermark",
+    "image",
+    "batch",
+    "privacy",
+    "local",
+    "certificate",
+    "图片水印",
+    "批量处理",
+    "隐私保护"
+  ],
+  "author": {
+    "name": "阿懒同学",
+    "url": "https://www.alantx.cn",
+    "github": "https://github.com/hloolx"
+  },
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hloolx/shuiyin.git"
+  },
+  "homepage": "https://github.com/hloolx/shuiyin",
+  "bugs": {
+    "url": "https://github.com/hloolx/shuiyin/issues"
+  },
+  "dependencies": {
+    "coffeescript": "^2.7.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

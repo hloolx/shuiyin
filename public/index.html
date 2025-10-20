@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <title>批量图片水印工具</title>
+    <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">
+                <img class="logo-icon" src="./images/logo.ico" alt="Logo" style="width: 24px; height: 24px;">
+                批量图片水印工具
+                <span class="version">v1.0.0</span>
+            </h1>
+            <p class="subtitle">安全地为您的图片批量添加水印，无任何网络请求，特别适合各种敏感证件处理</p>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="main-layout">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <!-- 上传区域 -->
+                <div class="upload-section card">
+                    <h2 class="section-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        图片上传
+                    </h2>
+                    
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-content">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17,8 12,3 7,8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="upload-text">拖拽图片到此处</p>
+                            <p class="upload-hint">支持批量选择</p>
+                        </div>
+                        <input type="file" id="image" multiple accept="image/*" class="file-input">
+                    </div>
+
+                    <div class="file-stats" id="file-stats" style="display: none;">
+                        <span class="stats-text">已选择 <span id="file-count">0</span> 个文件</span>
+                        <button class="btn btn-secondary btn-sm" id="clear-files">清空</button>
+                    </div>
+                </div>
+
+                <!-- 图片列表 -->
+                <div class="image-list card">
+                    <h2 class="section-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                        </svg>
+                        图片列表
+                    </h2>
+                    
+                    <div class="image-list-content" id="image-list">
+                        <div class="empty-list">
+                            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            <p>暂无图片</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧面板 -->
+            <div class="right-panel">
+                <!-- 设置面板 -->
+                <div class="settings-section card">
+                    <h2 class="section-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                        </svg>
+                        水印设置
+                    </h2>
+
+                    <div class="form-group">
+                        <label for="text" class="form-label">水印文字</label>
+                        <input type="text" id="text" class="form-input" placeholder="请输入水印文字" maxlength="30">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="color" class="form-label">颜色</label>
+                            <div class="color-input-wrapper">
+                                <input type="color" id="color" class="color-input" value="#2563eb">
+                                <span class="color-value">#2563eb</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="alpha" class="form-label">透明度</label>
+                            <div class="range-input-wrapper">
+                                <input type="range" id="alpha" class="range-input" min="0" max="1" step="0.05" value="0.15">
+                                <span class="range-value">0.15</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="angle" class="form-label">角度</label>
+                            <div class="range-input-wrapper">
+                                <input type="range" id="angle" class="range-input" min="-90" max="90" step="3" value="45">
+                                <span class="range-value">45°</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="space" class="form-label">间隔</label>
+                            <div class="range-input-wrapper">
+                                <input type="range" id="space" class="range-input" min="1" max="8" step="0.2" value="4">
+                                <span class="range-value">4</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="size" class="form-label">字号</label>
+                        <div class="range-input-wrapper">
+                            <input type="range" id="size" class="range-input" min="0.5" max="3" step="0.05" value="1">
+                            <span class="range-value">1</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="auto-refresh" checked>
+                            实时预览
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 预览区域 -->
+                <div class="preview-section card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            预览效果
+                        </h2>
+                        <div class="preview-controls">
+                            <button class="btn btn-secondary btn-sm" id="select-all">全选</button>
+                            <button class="btn btn-secondary btn-sm" id="deselect-all">取消全选</button>
+                            <button class="btn btn-primary btn-sm" id="refresh" disabled>刷新预览</button>
+                        </div>
+                    </div>
+
+                    <div class="preview-container" id="preview-container">
+                        <div class="preview-empty">
+                            <svg class="preview-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            <p>请选择图片查看预览</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮区 -->
+                <div class="action-section">
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" id="download-current">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            下载当前
+                        </button>
+                        <button class="btn btn-primary" id="download-selected">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            下载选中
+                        </button>
+                        <button class="btn btn-success" id="download-all">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                            导出为ZIP
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">
+                <span class="footer-item">基于</span>
+                <a href="https://github.com/joyqi/sfz" target="_blank" rel="noopener noreferrer" class="github-link">
+                    <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    joyqi/sfz
+                </a>
+                <span class="footer-item">开源项目修改 (GPL-3.0)</span>
+                <span class="separator">|</span>
+                <a href="https://github.com/hloolx/shuiyin" target="_blank" rel="noopener noreferrer" class="source-link">
+                    <svg class="source-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    查看源代码
+                </a>
+                <span class="separator">|</span>
+                <span class="footer-item">修改作者：</span>
+                <a href="https://www.alantx.cn" target="_blank" rel="noopener noreferrer" class="author-link">
+                    <img class="author-icon" src="./images/author.ico" alt="Author">
+                    阿懒同学
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 进度条模态框 -->
+    <div class="modal" id="progress-modal" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">处理中...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p class="progress-text" id="progress-text">正在处理第 1 张图片...</p>
+            <button class="btn btn-secondary" id="cancel-process">取消</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="./script.js?v=20251020"></script>
+</body>
+</html>
