@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-gray-600 md:flex-row">
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="https://water.15o.cc"
+              href="https://github.com/joyqi/sfz"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 hover:text-blue-600"
@@ -17,7 +17,7 @@ export function Footer() {
             </a>
             <span>·</span>
             <a
-              href="https://github.com/hloolv/shuiyin"
+              href="https://github.com/hloolx/shuiyin"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 hover:text-blue-600"
@@ -27,7 +27,7 @@ export function Footer() {
             </a>
             <span>·</span>
             <a
-              href="https://github.com/hloolv/shuiyin/blob/main/LICENSE"
+              href="https://github.com/hloolx/shuiyin/blob/master/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-blue-600"
@@ -40,12 +40,21 @@ export function Footer() {
             <p>
               作者:{' '}
               <a
-                href="https://github.com/hloolv"
+                href="https://github.com/hloolx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-600"
               >
                 阿懒同学
+              </a>
+              {' '}·{' '}
+              <a
+                href="https://www.alantx.cn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-blue-600"
+              >
+                博客
               </a>
             </p>
             <p className="mt-1 text-xs text-gray-500">

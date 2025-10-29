@@ -1,14 +1,29 @@
-# 水印 - 批量图片水印工具
+<p align="center">
+  <img src="public/images/watermark-icon.svg" width="100" height="100" alt="水印工具 Logo">
+</p>
 
-[![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.0-646CFF.svg)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-GPL--3.0-green.svg)](LICENSE)
+<h1 align="center">水印 - 批量图片水印工具</h1>
 
-> 现代化的批量图片水印工具，基于 React + TypeScript 重构自 [joyqi/sfz](https://github.com/joyqi/sfz)
->
-> 完全本地处理，保护隐私，支持批量导出和 ZIP 打包
+<p align="center">🎨 强大的批量图片水印在线工具</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18.3-blue.svg?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.6-blue.svg?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-7.0-646CFF.svg?logo=vite" alt="Vite">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?logo=tailwindcss" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/license-GPL--3.0-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/Author-阿懒同学-orange.svg" alt="Author">
+</p>
+
+<p align="center">🎮 在线演示：
+  <a href="https://water.15o.cc" target="_blank">
+  https://water.15o.cc
+  </a>
+</p>
+
+## 📖 简介
+
+现代化的批量图片水印工具，基于 React + TypeScript 重构自 [joyqi/sfz](https://github.com/joyqi/sfz)。完全本地处理，保护隐私，支持批量导出和 ZIP 打包。专为需要批量添加水印的用户设计，提供丰富的自定义选项和便捷的操作体验。
 
 ## ✨ 特性
 
@@ -198,14 +213,30 @@ npm run preview
 | 批量导出 | ❌ | ✅ |
 | ZIP 打包 | ❌ | ✅ |
 
+## CDN赞助
+
+本项目的 CDN 加速和安全保护由腾讯 EdgeOne 赞助
+
+<a href="https://edgeone.ai/?from=github" target="_blank">
+    最佳亚洲 CDN、Edge 和安全解决方案 - 腾讯 EdgeOne
+<img src="https://edgeone.ai/media/34fe3a45-492d-4ea4-ae5d-ea1087ca7b4b.png" width="500" height="100">
+</a>
+
+## 👨‍💻 作者
+
+- **阿懒同学** - [GitHub @hloolx](https://github.com/hloolx)
+- **个人博客** - [www.alantx.cn](https://www.alantx.cn)
+
 ## 🙏 致谢
+
+本项目基于 [joyqi/sfz](https://github.com/joyqi/sfz) 优化改进，感谢原项目作者的贡献。
 
 - 原项目: [joyqi/sfz](https://github.com/joyqi/sfz)
 - UI 设计系统: [shadcn/ui](https://ui.shadcn.com/)
 
 ## 📄 开源协议
 
-本项目遵循原项目的 GPL-3.0 协议。
+[GPL-3.0 License](LICENSE)
 
 ## 🤝 贡献
 
