@@ -1,4 +1,5 @@
-import { useRef, DragEvent } from 'react';
+import { useRef } from 'react';
+import type { DragEvent } from 'react';
 import { Upload } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';

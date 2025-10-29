@@ -16,8 +16,8 @@
 </p>
 
 <p align="center">🎮 在线演示：
-  <a href="https://water.15o.cc" target="_blank">
-  https://water.15o.cc
+  <a href="https://in.15o.cc" target="_blank">
+  https://in.15o.cc
   </a>
 </p>
 
