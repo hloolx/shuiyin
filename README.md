@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/images/watermark-icon.svg" width="100" height="100" alt="水印工具 Logo">
+  <img src="public/images/logo108.png" width="100" height="100" alt="水印工具 Logo">
 </p>
 
 <h1 align="center">水印 - 批量图片水印工具</h1>
