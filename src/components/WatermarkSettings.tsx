@@ -16,7 +16,7 @@ export function WatermarkSettings({
 }: WatermarkSettingsProps) {
   return (
     <Card className="h-fit">
-      <CardContent className="space-y-6 sm:space-y-8 py-4 sm:py-6">
+      <CardContent className="space-y-5 sm:space-y-8 py-4 sm:py-6 px-3 sm:px-6">
         {/* 水印文字 */}
         <div className="space-y-2 sm:space-y-3">
           <Label htmlFor="text" className="flex items-center gap-2 text-sm sm:text-base">
@@ -27,17 +27,17 @@ export function WatermarkSettings({
             id="text"
             type="text"
             maxLength={30}
-            placeholder="请输入水印文字（最多30个字符）"
+            placeholder="请输入水印文字"
             value={settings.text}
             onChange={(e) => onSettingsChange({ text: e.target.value })}
-            className="h-10 sm:h-11 text-sm sm:text-base"
+            className="h-10 sm:h-11 text-sm sm:text-base w-full"
           />
         </div>
 
         {/* 颜色选择 */}
         <div className="space-y-2 sm:space-y-3">
           <Label htmlFor="color" className="flex items-center gap-2 text-sm sm:text-base">
-            <Palette className="h-4 w-4" />
+            <Palette className="h-4 w-4 flex-shrink-0" />
             颜色
           </Label>
           <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function WatermarkSettings({
               type="text"
               value={settings.color}
               onChange={(e) => onSettingsChange({ color: e.target.value })}
-              className="w-28 sm:w-32 font-mono text-sm h-10 sm:h-11"
+              className="w-24 sm:w-32 font-mono text-sm h-10 sm:h-11"
               placeholder="#1e40af"
             />
           </div>

@@ -11,8 +11,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Plus,
-  Upload
+  Upload,
+  AlertCircle
 } from 'lucide-react';
 import { ImageUpload } from './components/ImageUpload';
 import { SidebarImageList } from './components/SidebarImageList';
@@ -33,12 +33,22 @@ function App() {
   const [showUpload, setShowUpload] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isWechat, setIsWechat] = useState(false);
   const [progress, setProgress] = useState<ProgressState>({
     isOpen: false,
     current: 0,
     total: 0,
     fileName: '',
   });
+
+  // 检测是否在微信浏览器中
+  useEffect(() => {
+    const checkWechat = () => {
+      const ua = navigator.userAgent.toLowerCase();
+      return ua.includes('micromessenger') || ua.includes('wechat');
+    };
+    setIsWechat(checkWechat());
+  }, []);
 
   // 全局文件处理
   const handleFilesSelect = useCallback((files: FileList | File[]) => {
@@ -320,7 +330,20 @@ function App() {
       </aside>
 
       {/* 主内容区 */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen && !isMobile ? 'lg:ml-72' : ''}`}>
+      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarOpen && !isMobile ? 'lg:ml-72' : ''}`}>
+        {/* 微信浏览器提示 */}
+        {isWechat && (
+          <div className="sticky top-0 z-40 bg-amber-50 border-b border-amber-200 px-4 py-3">
+            <div className="flex items-start gap-3 max-w-5xl mx-auto">
+              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-800">检测到您正在使用微信内置浏览器</p>
+                <p className="text-xs text-amber-700 mt-1">为获得最佳体验，请点击右上角菜单，选择「在浏览器打开」</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* 顶部栏 */}
         <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-border bg-surface/80 px-4 sm:px-6 lg:px-8 backdrop-blur-xl">
           <div className="flex items-center gap-3 min-w-0">
@@ -345,17 +368,6 @@ function App() {
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             {hasImages && (
               <>
-                {/* 添加图片按钮 - 二次上传入口 */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl bg-primary/10 px-3 sm:px-4 text-sm font-medium text-primary transition-all hover:bg-primary/20"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">添加图片</span>
-                  <span className="sm:hidden">添加</span>
-                </button>
-                
-                <div className="w-px h-6 bg-border mx-1 hidden sm:block" />
 
                 <button
                   onClick={handleDownloadSelected}
@@ -398,12 +410,14 @@ function App() {
 
             {/* 有图片时的布局 */}
             {hasImages && (
-              <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-[340px_1fr] xl:grid-cols-[380px_1fr]">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,340px)_1fr] xl:grid-cols-[minmax(0,380px)_1fr]">
                 {/* 左侧：水印设置 */}
-                <WatermarkSettings
-                  settings={watermark.settings}
-                  onSettingsChange={watermark.updateSettings}
-                />
+                <div className="min-w-0 overflow-hidden">
+                  <WatermarkSettings
+                    settings={watermark.settings}
+                    onSettingsChange={watermark.updateSettings}
+                  />
+                </div>
 
                 {/* 右侧：预览 */}
                 <div 
@@ -472,18 +486,6 @@ function App() {
       
       {/* 全局拖入遮罩 */}
       <GlobalDragOverlay isVisible={isGlobalDragging} />
-      
-      {/* 移动端悬浮添加按钮 */}
-      {hasImages && isMobile && (
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="fixed right-4 bottom-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30 transition-all active:scale-90 hover:scale-105"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-          aria-label="添加图片"
-        >
-          <Plus className="h-6 w-6" />
-        </button>
-      )}
       
       {/* 二次上传文件输入 - 支持多选，不包含 capture 属性 */}
       <input
