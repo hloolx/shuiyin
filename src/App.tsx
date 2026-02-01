@@ -197,7 +197,7 @@ function App() {
             <span>开源项目</span>
           </a>
           <p className="mt-2 px-3 text-xs text-foreground-tertiary">
-            v1.0.0 · GPL-3.0 · 阿懒同学
+            v1.0.1 · GPL-3.0 · 阿懒同学
           </p>
         </div>
       </aside>
