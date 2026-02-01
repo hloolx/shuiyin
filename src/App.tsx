@@ -485,7 +485,7 @@ function App() {
         </button>
       )}
       
-      {/* 二次上传文件输入 */}
+      {/* 二次上传文件输入 - 支持多选，不包含 capture 属性 */}
       <input
         ref={fileInputRef}
         type="file"
