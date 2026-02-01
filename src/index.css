@@ -2,9 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@layer base {
+  :root {
+    --background: #FAFAFA;
+    --surface: #FFFFFF;
+    --primary: #1e40af;
+    --primary-light: #dbeafe;
+    --border: rgba(0, 0, 0, 0.06);
+    --border-hover: rgba(0, 0, 0, 0.12);
+    --foreground: #0f172a;
+    --foreground-secondary: #475569;
+    --foreground-tertiary: #94a3b8;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 微妙的悬停过渡 */
+  .hover-lift {
+    @apply transition-all duration-300 ease-smooth;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-elevated;
+  }
+
+  /* 玻璃态效果 */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl;
+  }
+
+  /* 极细边框 */
+  .border-hairline {
+    border-width: 0.5px;
+  }
+
+  /* 选中态样式 */
+  .selected-ring {
+    @apply ring-2 ring-primary/20 ring-offset-2 ring-offset-background;
+  }
 }

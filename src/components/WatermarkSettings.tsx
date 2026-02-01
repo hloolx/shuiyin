@@ -1,5 +1,6 @@
+import { Type, Palette } from 'lucide-react';
 import type { WatermarkSettings as WatermarkSettingsType } from '../types';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
+import { Card, CardContent } from './ui/Card';
 import { Input } from './ui/Input';
 import { Label } from './ui/Label';
 import { Slider } from './ui/Slider';
@@ -14,56 +15,58 @@ export function WatermarkSettings({
   onSettingsChange,
 }: WatermarkSettingsProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>水印设置</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* 水印文字和颜色 - 同一行 */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto]">
-          {/* 水印文字 */}
-          <div className="space-y-2">
-            <Label htmlFor="text">水印文字</Label>
-            <Input
-              id="text"
-              type="text"
-              maxLength={30}
-              placeholder="请输入水印文字（最多30个字符）"
-              value={settings.text}
-              onChange={(e) => onSettingsChange({ text: e.target.value })}
-            />
-          </div>
+    <Card className="h-fit">
+      <CardContent className="space-y-8 py-6">
+        {/* 水印文字 */}
+        <div className="space-y-3">
+          <Label htmlFor="text" className="flex items-center gap-2">
+            <Type className="h-4 w-4" />
+            水印文字
+          </Label>
+          <Input
+            id="text"
+            type="text"
+            maxLength={30}
+            placeholder="请输入水印文字（最多30个字符）"
+            value={settings.text}
+            onChange={(e) => onSettingsChange({ text: e.target.value })}
+          />
+        </div>
 
-          {/* 颜色 */}
-          <div className="space-y-2">
-            <Label htmlFor="color">颜色</Label>
-            <div className="flex items-center gap-2">
+        {/* 颜色选择 */}
+        <div className="space-y-3">
+          <Label htmlFor="color" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            颜色
+          </Label>
+          <div className="flex items-center gap-3">
+            <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-border">
               <input
                 id="color"
                 type="color"
                 value={settings.color}
                 onChange={(e) => onSettingsChange({ color: e.target.value })}
-                className="h-10 w-16 cursor-pointer rounded-md border border-gray-300"
-              />
-              <Input
-                type="text"
-                value={settings.color}
-                onChange={(e) => onSettingsChange({ color: e.target.value })}
-                className="w-28"
-                placeholder="#2563eb"
+                className="absolute -left-2 -top-2 h-16 w-16 cursor-pointer"
               />
             </div>
+            <Input
+              type="text"
+              value={settings.color}
+              onChange={(e) => onSettingsChange({ color: e.target.value })}
+              className="w-32 font-mono text-sm"
+              placeholder="#1e40af"
+            />
           </div>
         </div>
 
-        {/* 滑块控件 - 两列布局 */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* 滑块控件 */}
+        <div className="space-y-6">
           {/* 透明度 */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="alpha">透明度</Label>
-              <span className="text-sm font-medium text-gray-700">
-                {settings.alpha.toFixed(2)}
+              <span className="rounded-lg bg-foreground/5 px-2.5 py-1 text-xs font-medium text-foreground-secondary">
+                {Math.round(settings.alpha * 100)}%
               </span>
             </div>
             <Slider
@@ -77,10 +80,10 @@ export function WatermarkSettings({
           </div>
 
           {/* 旋转角度 */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="angle">旋转角度</Label>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="rounded-lg bg-foreground/5 px-2.5 py-1 text-xs font-medium text-foreground-secondary">
                 {settings.angle}°
               </span>
             </div>
@@ -88,18 +91,18 @@ export function WatermarkSettings({
               id="angle"
               min={-90}
               max={90}
-              step={3}
+              step={5}
               value={settings.angle}
               onValueChange={(value) => onSettingsChange({ angle: value })}
             />
           </div>
 
           {/* 水印间隔 */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="space">水印间隔</Label>
-              <span className="text-sm font-medium text-gray-700">
-                {settings.space.toFixed(1)}
+              <span className="rounded-lg bg-foreground/5 px-2.5 py-1 text-xs font-medium text-foreground-secondary">
+                {settings.space.toFixed(1)}x
               </span>
             </div>
             <Slider
@@ -113,11 +116,11 @@ export function WatermarkSettings({
           </div>
 
           {/* 字号大小 */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="size">字号大小</Label>
-              <span className="text-sm font-medium text-gray-700">
-                {settings.size.toFixed(2)}
+              <span className="rounded-lg bg-foreground/5 px-2.5 py-1 text-xs font-medium text-foreground-secondary">
+                {settings.size.toFixed(2)}x
               </span>
             </div>
             <Slider

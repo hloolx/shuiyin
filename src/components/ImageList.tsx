@@ -1,4 +1,4 @@
-import { Trash2, CheckSquare, Square } from 'lucide-react';
+import { Trash2, CheckSquare, Square, Images } from 'lucide-react';
 import type { ImageFile } from '../types';
 import { formatFileSize } from '../utils/canvas';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
@@ -26,45 +26,61 @@ export function ImageList({
   onDeselectAll,
   onClearAll,
 }: ImageListProps) {
+  const selectedCount = images.filter(img => img.selected).length;
+
   if (images.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-sm text-gray-500">还没有上传图片</p>
-          <p className="mt-1 text-xs text-gray-400">请点击上方区域上传图片</p>
-        </CardContent>
+      <Card className="flex h-[400px] flex-col items-center justify-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-foreground/5">
+          <Images className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <p className="mt-4 text-sm font-medium text-foreground-secondary">还没有上传图片</p>
+        <p className="mt-1 text-xs text-muted-foreground">请在上方区域上传图片</p>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex h-[calc(100vh-280px)] min-h-[500px] flex-col">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle>图片列表 ({images.length})</CardTitle>
-          <div className="flex gap-2">
-            <Button size="sm" variant="secondary" onClick={onSelectAll}>
-              全选
+          <CardTitle className="flex items-center gap-2">
+            图片列表
+            <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-xs font-normal text-muted-foreground">
+              {images.length}
+            </span>
+          </CardTitle>
+          
+          {/* 批量操作 */}
+          <div className="flex items-center gap-1">
+            {selectedCount > 0 && (
+              <span className="mr-2 text-xs text-muted-foreground">
+                已选 {selectedCount}
+              </span>
+            )}
+            <Button size="icon" variant="ghost" onClick={onSelectAll} title="全选">
+              <CheckSquare className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="secondary" onClick={onDeselectAll}>
-              取消
+            <Button size="icon" variant="ghost" onClick={onDeselectAll} title="取消选择">
+              <Square className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="secondary" onClick={onClearAll}>
-              清空
+            <Button size="icon" variant="ghost" onClick={onClearAll} title="清空">
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="max-h-[500px] space-y-2 overflow-y-auto">
+
+      <CardContent className="flex-1 overflow-hidden px-4 pb-4">
+        <div className="h-full space-y-2 overflow-y-auto pr-2">
           {images.map((image, index) => (
             <div
               key={image.id}
               className={cn(
-                'flex items-center gap-3 rounded-lg border p-3 transition-colors',
+                'group flex items-center gap-3 rounded-xl border p-3 transition-all duration-200',
                 currentIndex === index
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:bg-gray-50'
+                  ? 'border-primary/30 bg-primary/5'
+                  : 'border-border bg-surface hover:border-border-hover hover:bg-foreground/[0.02]'
               )}
             >
               {/* 复选框 */}
@@ -73,30 +89,35 @@ export function ImageList({
                   e.stopPropagation();
                   onToggleSelection(image.id);
                 }}
-                className="flex-shrink-0 text-gray-400 hover:text-blue-600"
+                className="flex-shrink-0 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-primary"
               >
                 {image.selected ? (
-                  <CheckSquare className="h-5 w-5 text-blue-600" />
+                  <CheckSquare className="h-5 w-5 text-primary" />
                 ) : (
                   <Square className="h-5 w-5" />
                 )}
               </button>
 
-              {/* 缩略图 */}
+              {/* 缩略图和信息 */}
               <button
                 onClick={() => onSelect(index)}
                 className="flex flex-1 items-center gap-3 text-left"
               >
-                <img
-                  src={image.preview}
-                  alt={image.file.name}
-                  className="h-14 w-14 rounded object-cover"
-                />
-                <div className="flex-1 overflow-hidden">
-                  <p className="truncate text-sm font-medium text-gray-900">
+                <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-background">
+                  <img
+                    src={image.preview}
+                    alt={image.file.name}
+                    className="h-full w-full object-cover"
+                  />
+                  {currentIndex === index && (
+                    <div className="absolute inset-0 ring-2 ring-inset ring-primary/30" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">
                     {image.file.name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {formatFileSize(image.file.size)}
                   </p>
                 </div>
@@ -108,7 +129,7 @@ export function ImageList({
                   e.stopPropagation();
                   onRemove(image.id);
                 }}
-                className="flex-shrink-0 rounded p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                className="flex-shrink-0 rounded-lg p-2 text-muted-foreground opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

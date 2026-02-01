@@ -13,35 +13,45 @@ export function ProgressModal({ progress }: ProgressModalProps) {
     : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">
-            正在处理图片...
-          </h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl bg-surface p-8 shadow-elevated">
+        <div className="mb-6 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">
+              正在处理图片...
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              请稍候，正在添加水印
+            </p>
+          </div>
         </div>
 
-        <div className="mb-4">
-          <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="text-gray-600">
+        <div className="mb-6">
+          <div className="mb-3 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
               进度: {progress.current} / {progress.total}
             </span>
-            <span className="font-medium text-gray-900">{percentage}%</span>
+            <span className="font-semibold text-foreground">{percentage}%</span>
           </div>
 
           {/* 进度条 */}
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-foreground/10">
             <div
-              className="h-full rounded-full bg-blue-600 transition-all duration-300"
+              className="h-full rounded-full bg-primary transition-all duration-300 ease-smooth"
               style={{ width: `${percentage}%` }}
             />
           </div>
         </div>
 
-        <p className="truncate text-sm text-gray-500">
-          当前文件: {progress.fileName}
-        </p>
+        <div className="rounded-xl bg-background p-4">
+          <p className="truncate text-sm text-muted-foreground">
+            <span className="text-foreground-tertiary">当前文件:</span>{' '}
+            <span className="font-medium text-foreground-secondary">{progress.fileName}</span>
+          </p>
+        </div>
       </div>
     </div>
   );

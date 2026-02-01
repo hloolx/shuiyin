@@ -3,7 +3,7 @@ import type { WatermarkSettings, ImageFile } from '../types';
 import { loadImageToCanvas } from '../utils/canvas';
 
 const DEFAULT_SETTINGS: WatermarkSettings = {
-  text: '',
+  text: 'in.15o.cc',
   color: '#2563eb',
   alpha: 0.15,
   angle: 45,
