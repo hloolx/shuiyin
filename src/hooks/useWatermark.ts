@@ -15,7 +15,11 @@ export function useWatermark(currentImage: ImageFile | null) {
   const [settings, setSettings] = useState<WatermarkSettings>(DEFAULT_SETTINGS);
   const [previewCanvas, setPreviewCanvas] = useState<HTMLCanvasElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
   const canvasCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const processingRef = useRef<Set<string>>(new Set());
+  const lastImageIdRef = useRef<string | null>(null);
 
   // 更新设置
   const updateSettings = useCallback((partial: Partial<WatermarkSettings>) => {
@@ -28,44 +32,82 @@ export function useWatermark(currentImage: ImageFile | null) {
   }, []);
 
   // 生成预览
-  const generatePreview = useCallback(async () => {
-    if (!currentImage) {
-      setPreviewCanvas(null);
+  const generatePreview = useCallback(async (image: ImageFile, currentSettings: WatermarkSettings) => {
+    const cacheKey = `${image.id}-${JSON.stringify(currentSettings)}`;
+    
+    // 如果正在处理这个确切的请求，跳过
+    if (processingRef.current.has(cacheKey)) return;
+    
+    // 取消之前的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
+
+    // 检查缓存
+    const cachedCanvas = canvasCacheRef.current.get(cacheKey);
+    if (cachedCanvas && !signal.aborted) {
+      setPreviewCanvas(cachedCanvas);
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
+    processingRef.current.add(cacheKey);
 
     try {
-      // 检查缓存
-      const cacheKey = `${currentImage.id}-${JSON.stringify(settings)}`;
-      let canvas = canvasCacheRef.current.get(cacheKey);
-
-      if (!canvas) {
-        // 生成新的 canvas
-        canvas = await loadImageToCanvas(currentImage.file, settings);
+      const canvas = await loadImageToCanvas(image.file, currentSettings);
+      
+      if (!signal.aborted) {
         canvasCacheRef.current.set(cacheKey, canvas);
+        setPreviewCanvas(canvas);
+        lastImageIdRef.current = image.id;
       }
-
-      setPreviewCanvas(canvas);
     } catch (error) {
-      console.error('Failed to generate preview:', error);
-      setPreviewCanvas(null);
+      if (!signal.aborted) {
+        console.error('Failed to generate preview:', error);
+      }
     } finally {
-      setIsLoading(false);
+      if (!signal.aborted) {
+        setIsLoading(false);
+      }
+      processingRef.current.delete(cacheKey);
     }
-  }, [currentImage, settings]);
+  }, []);
 
-  // 当设置改变时，自动重新生成预览
+  // 当当前图片或设置改变时，生成预览
   useEffect(() => {
-    clearCache();
-    generatePreview();
-  }, [settings, clearCache, generatePreview]);
+    if (!currentImage) {
+      setPreviewCanvas(null);
+      setIsLoading(false);
+      lastImageIdRef.current = null;
+      return;
+    }
 
-  // 当当前图片改变时，生成预览
+    // 图片改变时显示加载状态，设置改变时不显示
+    const isImageChanged = lastImageIdRef.current !== currentImage.id;
+    if (isImageChanged) {
+      setIsLoading(true);
+    }
+
+    // 使用 requestAnimationFrame 延迟执行，避免阻塞 UI
+    const rafId = requestAnimationFrame(() => {
+      generatePreview(currentImage, settings);
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [currentImage, settings, generatePreview]);
+
+  // 清理
   useEffect(() => {
-    generatePreview();
-  }, [currentImage?.id]); // 只监听图片 ID 变化
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // 生成指定图片的 canvas（用于批量下载）
   const generateCanvas = useCallback(

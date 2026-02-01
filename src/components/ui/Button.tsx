@@ -16,6 +16,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           'transition-all duration-200 ease-smooth',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20',
           'disabled:pointer-events-none disabled:opacity-40',
+          // 移动端触摸优化
+          'active:scale-95 touch-manipulation',
           {
             // 主按钮 - 深蓝强调色
             'bg-primary text-white shadow-subtle hover:bg-primary-800 hover:shadow-card':
@@ -31,10 +33,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               variant === 'outline',
           },
           {
-            'h-8 px-3 text-xs': size === 'sm',
-            'h-10 px-4 text-sm': size === 'md',
-            'h-12 px-6 text-base': size === 'lg',
-            'h-10 w-10 p-0': size === 'icon',
+            // 尺寸 - 移动端增大触摸区域
+            'h-9 sm:h-8 px-3.5 sm:px-3 text-sm sm:text-xs': size === 'sm',
+            'h-11 sm:h-10 px-5 sm:px-4 text-sm': size === 'md',
+            'h-12 sm:h-12 px-6 text-base': size === 'lg',
+            'h-11 w-11 sm:h-10 sm:w-10 p-0': size === 'icon',
           },
           className
         )}

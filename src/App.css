@@ -1,42 +1,54 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* 项目特定样式 - 主要使用 Tailwind CSS */
+
+/* 确保 canvas 不会溢出容器 */
+canvas {
+  max-width: 100%;
+  height: auto;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* 移动端优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 禁用双击缩放 */
+  * {
+    touch-action: manipulation;
   }
-  to {
-    transform: rotate(360deg);
+  
+  /* 图片禁用长按菜单 */
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  /* 但允许在特定容器内的图片有 pointer-events */
+  .allow-pointer-events img,
+  button img,
+  [role="button"] img {
+    pointer-events: auto;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  /* 底部安全区域适配 */
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 
-.read-the-docs {
-  color: #888;
+  /* iOS 底部横条适配 */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* 手势提示动画 */
+  @keyframes slideHint {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(4px); }
+  }
+
+  .swipe-hint-right {
+    animation: slideHint 1.5s ease-in-out infinite;
+  }
+
+  .swipe-hint-left {
+    animation: slideHint 1.5s ease-in-out infinite reverse;
+  }
 }
