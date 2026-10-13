@@ -1,7 +1,8 @@
 import { AnimatePresence, LazyMotion, MotionConfig, m, type Variants } from 'motion/react';
 import { useCallback, useRef, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { Download, FileArchive, Github, Keyboard, Menu, Moon, Plus, Sun, X } from 'lucide-react';
+import { Download, FileArchive, Github, Keyboard, Menu, Moon, Plus, Sun } from 'lucide-react';
+import { motionTokens } from './components/arc/lib/motion-tokens';
 import type { ExportOptions, ExportProgress, WatermarkSettings } from './types';
 import { useImageStore } from './hooks/useImageStore';
 import { usePersistentState } from './hooks/usePersistentState';
@@ -38,11 +39,11 @@ const SHORTCUTS: [string, string][] = [
   ['Delete', '移除当前'],
 ];
 
-const spring = { type: 'spring', stiffness: 260, damping: 28 } as const;
-const fromLeft: Variants = { hidden: { x: -32, opacity: 0 }, show: { x: 0, opacity: 1, transition: spring } };
-const fromRight: Variants = { hidden: { x: 32, opacity: 0 }, show: { x: 0, opacity: 1, transition: { ...spring, delay: 0.06 } } };
-const fromTop: Variants = { hidden: { y: -12, opacity: 0 }, show: { y: 0, opacity: 1, transition: spring } };
-const zoomIn: Variants = { hidden: { scale: 0.97, opacity: 0 }, show: { scale: 1, opacity: 1, transition: { ...spring, delay: 0.03 } } };
+const spring = motionTokens.spring.smooth;
+const fromLeft: Variants = { hidden: {}, show: {} };
+const fromRight = fromLeft;
+const fromTop = fromLeft;
+const zoomIn = fromLeft;
 
 const loadMotionFeatures = () => import('./lib/motion-features').then((mod) => mod.default);
 
@@ -50,29 +51,11 @@ const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const shortName = (name: string) => (name.length > 18 ? `${name.slice(0, 16)}…` : name);
 
 function ThemeButton({ theme, onToggle }: { theme: 'light' | 'dark'; onToggle: () => void }) {
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={onToggle}
-      aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
-      title={theme === 'dark' ? '浅色模式' : '深色模式'}
-    >
-      <AnimatePresence mode="wait" initial={false}>
-        <m.span
-          key={theme}
-          initial={{ rotate: -90, scale: 0.4, opacity: 0 }}
-          animate={{ rotate: 0, scale: 1, opacity: 1 }}
-          exit={{ rotate: 90, scale: 0.4, opacity: 0 }}
-          transition={{ duration: 0.18 }}
-        >
-          {theme === 'dark' ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
-        </m.span>
-      </AnimatePresence>
-    </Button>
-  );
+  return <Button variant="secondary" size="icon" onClick={onToggle} aria-pressed={theme === 'dark'}
+    aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}>
+    {theme === 'dark' ? <Moon size={16} aria-hidden /> : <Sun size={16} aria-hidden />}
+  </Button>;
 }
-
 function GithubLink() {
   return (
     <a
@@ -81,27 +64,15 @@ function GithubLink() {
       rel="noopener noreferrer"
       aria-label="GitHub 开源地址"
       title="GitHub"
-      className="flex h-10 w-10 items-center justify-center rounded-xl text-foreground-secondary transition-colors hover:bg-surface-2 hover:text-foreground"
+      className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground-secondary transition-colors hover:bg-surface-2 hover:text-foreground"
     >
       <Github className="h-[18px] w-[18px]" />
     </a>
   );
 }
 
-/** 数字变化时轻微弹一下 */
-function CountBadge({ value }: { value: number }) {
-  return (
-    <m.span
-      key={value}
-      initial={{ scale: 0.6, opacity: 0.4 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 600, damping: 20 }}
-      className="tabular inline-flex min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs"
-    >
-      {value}
-    </m.span>
-  );
-}
+/** 导出数量保持稳定占位。 */
+function CountBadge({ value }: { value: number }) { return <span className="count-badge">{value}</span>; }
 
 function Credits() {
   return (
@@ -133,7 +104,7 @@ function SidebarFooter() {
             {SHORTCUTS.map(([keys, desc]) => (
               <li key={desc} className="flex items-center justify-between py-1 text-xs text-foreground-secondary">
                 <span>{desc}</span>
-                <kbd className="rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-[11px] text-foreground-tertiary">
+                <kbd className="rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-xs text-foreground-tertiary">
                   {keys}
                 </kbd>
               </li>
@@ -151,7 +122,7 @@ function SidebarFooter() {
         <Keyboard className="h-3.5 w-3.5" />
         {open ? '收起快捷键' : '键盘快捷键'}
       </button>
-      <p className="mt-2 text-[11px] leading-relaxed text-foreground-tertiary">
+      <p className="mt-2 text-xs leading-relaxed text-foreground-tertiary">
         <Credits />
       </p>
     </div>
@@ -390,20 +361,20 @@ export default function App() {
     view = (
       <m.div
         key="landing"
-        className="flex min-h-dvh flex-col"
+        className="landing-shell"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, transition: { duration: 0.18 } }}
       >
-        <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-6">
+        <header className="landing-header">
           <Brand />
           <div className="flex items-center gap-1">
             <ThemeButton theme={theme} onToggle={toggleTheme} />
             <GithubLink />
           </div>
         </header>
-        <main className="flex-1">
-          <Landing onPick={pick} onCamera={openCamera} showCamera={touch} />
+        <main>
+          <Landing onPick={pick} onFiles={addFiles} onCamera={openCamera} showCamera={touch} />
         </main>
         <footer className="pb-safe">
           <p className="px-4 py-5 text-center text-xs text-foreground-tertiary">
@@ -415,8 +386,8 @@ export default function App() {
   } else if (isDesktop) {
     view = (
       <m.div key="editor-desktop" className="flex h-dvh overflow-hidden" initial="hidden" animate="show" exit={{ opacity: 0 }}>
-        <m.aside variants={fromLeft} className="flex w-64 shrink-0 flex-col border-r border-border bg-surface xl:w-72">
-          <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
+        <m.aside variants={fromLeft} className="editor-sidebar">
+          <div className="flex h-[76px] shrink-0 items-center border-b border-border px-5">
             <Brand />
           </div>
           <ImageListPanel {...listPanelProps} layoutKey="sidebar" onSelect={setCurrent} onAdd={pick} />
@@ -426,7 +397,7 @@ export default function App() {
         <div className="flex min-w-0 flex-1 flex-col">
           <m.header
             variants={fromTop}
-            className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-surface/70 px-5 backdrop-blur-xl"
+            className="editor-toolbar"
           >
             <div className="min-w-0 flex-1">
               <AnimatePresence mode="wait" initial={false}>
@@ -437,7 +408,7 @@ export default function App() {
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <p className="truncate text-sm font-semibold text-foreground">{current?.name}</p>
+                  <h1 className="truncate text-sm font-medium text-foreground">{current?.name}</h1>
                   <p className="tabular truncate text-xs text-foreground-tertiary">
                     {currentMeta} · 第 {currentIndex + 1} / {items.length} 张
                   </p>
@@ -458,23 +429,23 @@ export default function App() {
               title={`导出所有勾选的图片（${MOD}+Shift+S）`}
             >
               <FileArchive className="h-4 w-4" />
-              {selected.length > 1 ? '导出所选' : '导出'}
+              导出所选
               <CountBadge value={selected.length} />
             </Button>
           </m.header>
 
-          <div className="flex min-h-0 flex-1 gap-5 p-5">
+          <main className="editor-body">
             <m.div variants={zoomIn} className="min-w-0 flex-1">
               <PreviewStage {...stageProps} swipe={false} className="h-full" />
             </m.div>
             <m.aside
               variants={fromRight}
               aria-label="水印设置"
-              className="w-[340px] shrink-0 overflow-y-auto overscroll-contain rounded-3xl border border-border bg-surface shadow-card xl:w-[360px]"
+              className="editor-inspector"
             >
               {settingsPanel}
             </m.aside>
-          </div>
+          </main>
         </div>
       </m.div>
     );
@@ -482,21 +453,19 @@ export default function App() {
     view = (
       <m.div
         key="editor-mobile"
-        className="min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))]"
+        className="mobile-editor min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <header className="sticky top-0 z-30 flex h-14 items-center gap-1 border-b border-border bg-surface/85 px-2 backdrop-blur-xl">
-          <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(true)} aria-label="打开图片列表" className="relative">
+          <Button variant="ghost" onClick={() => setDrawerOpen(true)} aria-label={`打开图片列表（${items.length} 张）`}>
             <Menu className="h-5 w-5" />
-            <span className="tabular absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-fg">
-              {items.length}
-            </span>
+            <CountBadge value={items.length} />
           </Button>
           <div className="min-w-0 flex-1 px-1">
-            <p className="truncate text-sm font-semibold text-foreground">{current?.name}</p>
-            <p className="tabular truncate text-[11px] text-foreground-tertiary">{currentMeta}</p>
+            <h1 className="truncate text-sm font-medium text-foreground">{current?.name}</h1>
+            <p className="tabular truncate text-xs text-foreground-tertiary">{currentMeta}</p>
           </div>
           <ThemeButton theme={theme} onToggle={toggleTheme} />
           <Button variant="ghost" size="icon" onClick={pick} aria-label="添加图片">
@@ -504,7 +473,8 @@ export default function App() {
           </Button>
         </header>
 
-        <div className="sticky top-14 z-20 bg-background/95 px-3 pt-3 backdrop-blur">
+        <main>
+        <div className="sticky top-14 z-20 bg-background px-3 pt-3">
           <PreviewStage {...stageProps} swipe className="h-[min(46vh,440px)]" />
         </div>
         <ThumbStrip items={items} currentId={store.currentId} onSelect={setCurrent} onAdd={pick} />
@@ -517,9 +487,10 @@ export default function App() {
         >
           {settingsPanel}
         </m.div>
-        <p className="px-4 py-6 text-center text-[11px] text-foreground-tertiary">
+        <p className="px-4 py-6 text-center text-xs text-foreground-tertiary">
           <Credits />
         </p>
+        </main>
 
         <m.div
           className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/90 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl"
@@ -547,12 +518,6 @@ export default function App() {
         </m.div>
 
         <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-border pl-4 pr-2">
-            <Brand compact />
-            <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} aria-label="关闭">
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
           <ImageListPanel
             {...listPanelProps}
             layoutKey="drawer"
@@ -571,7 +536,7 @@ export default function App() {
   }
 
   return (
-    <LazyMotion features={loadMotionFeatures} strict>
+    <LazyMotion features={loadMotionFeatures}>
       <MotionConfig reducedMotion="user">
         {isWeChat && <WeChatTip />}
         <AnimatePresence mode="wait" initial={false}>

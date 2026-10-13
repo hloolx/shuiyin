@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Arc registry source is vendored unchanged; TypeScript still checks it.
+  globalIgnores(['dist', 'src/components/arc/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

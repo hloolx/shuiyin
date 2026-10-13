@@ -1,6 +1,6 @@
 import type { ExportOptions, WatermarkSettings } from '../types';
 
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '2.1.0';
 
 export const DEFAULT_SETTINGS: WatermarkSettings = {
   text: '仅供XX使用，他用无效',

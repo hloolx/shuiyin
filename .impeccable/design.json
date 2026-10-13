@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T08:05:11.672053+00:00",
+  "title": "Design System: 水印 · Arc",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Surface Muted",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Text Secondary",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Border Strong",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "accent-subtle": {
+        "role": "neutral",
+        "displayName": "Accent Subtle",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "control-on": {
+        "role": "neutral",
+        "displayName": "Control On",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-background": {
+        "role": "neutral",
+        "displayName": "Dark Background",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-surface-muted": {
+        "role": "neutral",
+        "displayName": "Dark Surface Muted",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Foreground",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-text-secondary": {
+        "role": "neutral",
+        "displayName": "Dark Text Secondary",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Dark Border",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-border-strong": {
+        "role": "neutral",
+        "displayName": "Dark Border Strong",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Dark Accent",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-accent-subtle": {
+        "role": "neutral",
+        "displayName": "Dark Accent Subtle",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      },
+      "dark-control-on": {
+        "role": "neutral",
+        "displayName": "Dark Control On",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(23% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(46% 0 0)",
+          "oklch(59% 0 0)",
+          "oklch(72% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(95.8% 0 0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Geist display",
+        "purpose": "Landing headline; Chinese glyphs use the declared fallbacks."
+      },
+      "body": {
+        "displayName": "Inter body",
+        "purpose": "Compact application copy and editing controls."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-resting",
+        "value": "0 1px 2px oklch(0% 0 0 / .035)",
+        "purpose": "Arc resting elevation in light theme."
+      },
+      {
+        "name": "shadow-floating",
+        "value": "0 20px 48px oklch(0% 0 0 / .105), 0 3px 10px oklch(0% 0 0 / .045)",
+        "purpose": "Arc floating elevation in light theme."
+      },
+      {
+        "name": "shadow-resting-dark",
+        "value": "0 1px 2px oklch(0% 0 0 / .18)",
+        "purpose": "Arc resting elevation in dark theme."
+      },
+      {
+        "name": "shadow-floating-dark",
+        "value": "0 22px 55px oklch(0% 0 0 / .34)",
+        "purpose": "Arc floating elevation in dark theme."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "160ms",
+        "purpose": "Shared Arc state transition token."
+      },
+      {
+        "name": "duration-standard",
+        "value": "240ms",
+        "purpose": "Shared Arc state transition token."
+      },
+      {
+        "name": "duration-spring",
+        "value": "580ms",
+        "purpose": "Shared Arc state transition token."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(.22,1,.36,1)",
+        "purpose": "Shared Arc state transition token."
+      },
+      {
+        "name": "ease-spring",
+        "value": "linear(0, 0.0258, 0.09, 0.1763, 0.2732, 0.3724, 0.4683, 0.5573, 0.6376, 0.7082, 0.7689, 0.8202, 0.8628, 0.8976, 0.9256, 0.9476, 0.9648, 0.9778, 0.9875, 0.9945, 0.9994, 1.0026, 1.0047, 1.0058, 1.0062, 1.0062, 1.0059, 1.0055, 1.0049, 1.0043, 1.0036, 1.0031, 1.0025, 1.002, 1.0016, 1.0013, 1)",
+        "purpose": "Shared Arc state transition token."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "landing-stack",
+        "value": "768px"
+      },
+      {
+        "name": "desktop-editor",
+        "value": "1024px"
+      },
+      {
+        "name": "full-width-editor-panels",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Arc primary action with keyboard and pointer feedback.",
+      "html": "<button class=\"ds-button-primary\">导出所选</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--control-height-md);padding:0 var(--space-4);border:1px solid transparent;border-radius:var(--radius-control);font-family:var(--font-body);font-size:var(--text-sm);font-weight:500;line-height:var(--leading-body);cursor:pointer;transition:background var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard);background:var(--foreground);color:var(--background);border-color:var(--foreground);}.ds-button-primary:hover:not(:disabled){opacity:.91;box-shadow:var(--shadow-resting);}.ds-button-primary:active:not(:disabled){opacity:.84;}.ds-button-primary:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-strong) 72%,transparent);outline-offset:2px;}.ds-button-primary:disabled{opacity:.52;cursor:not-allowed;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Arc secondary action with keyboard and pointer feedback.",
+      "html": "<button class=\"ds-button-secondary\">下载当前</button>",
+      "css": ".ds-button-secondary{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--control-height-md);padding:0 var(--space-4);border:1px solid transparent;border-radius:var(--radius-control);font-family:var(--font-body);font-size:var(--text-sm);font-weight:500;line-height:var(--leading-body);cursor:pointer;transition:background var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard);background:var(--surface);color:var(--foreground);border-color:var(--border);}.ds-button-secondary:hover:not(:disabled){background:var(--surface-muted);box-shadow:var(--shadow-resting);}.ds-button-secondary:active:not(:disabled){background:var(--surface-muted);}.ds-button-secondary:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-strong) 72%,transparent);outline-offset:2px;}.ds-button-secondary:disabled{opacity:1;color:var(--text-muted);background:var(--surface-muted);border-color:var(--border);cursor:not-allowed;}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Arc ghost action with keyboard and pointer feedback.",
+      "html": "<button class=\"ds-button-ghost\">恢复默认</button>",
+      "css": ".ds-button-ghost{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--control-height-md);padding:0 var(--space-4);border:1px solid transparent;border-radius:var(--radius-control);font-family:var(--font-body);font-size:var(--text-sm);font-weight:500;line-height:var(--leading-body);cursor:pointer;transition:background var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard);background:transparent;color:var(--text-secondary);}.ds-button-ghost:hover:not(:disabled){background:var(--surface-muted);color:var(--foreground);}.ds-button-ghost:active:not(:disabled){background:var(--surface-muted);color:var(--foreground);}.ds-button-ghost:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-strong) 72%,transparent);outline-offset:2px;}.ds-button-ghost:disabled{opacity:1;color:var(--text-muted);cursor:not-allowed;}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Watermark text with a strong editable border.",
+      "html": "<label class=\"ds-field\">水印文字<input class=\"ds-input\" value=\"仅供办理业务使用\" /></label>",
+      "css": ".ds-field{display:grid;gap:var(--space-2);color:var(--foreground);font:500 var(--text-sm)/1.4 var(--font-body);}.ds-input{min-height:var(--control-height-md);padding:0 var(--space-3);border:1px solid var(--border-strong);border-radius:var(--radius-control);background:var(--surface);color:var(--foreground);font:400 var(--text-sm)/1.4 var(--font-body);letter-spacing:var(--tracking-body);transition:border-color var(--duration-fast) var(--ease-standard);}.ds-input:hover,.ds-input:focus-visible{border-color:var(--foreground);outline:none;}.ds-input[aria-invalid=\"true\"]{border-color:var(--danger);}.ds-input:disabled{opacity:.5;background:var(--surface-muted);}"
+    },
+    {
+      "name": "Tool Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Flat inspector container, divided into tool sections.",
+      "html": "<section class=\"ds-panel\"><h2>水印设置</h2><div class=\"ds-section\">文字与样式</div></section>",
+      "css": ".ds-panel{border:1px solid var(--border);border-radius:var(--radius-panel);background:var(--surface);color:var(--foreground);font:var(--text-sm)/1.5 var(--font-body);overflow:hidden;}.ds-panel h2{margin:0;padding:var(--space-6);font-size:var(--text-base);font-weight:500;border-bottom:1px solid var(--border);}.ds-section{padding:var(--space-6);}"
+    },
+    {
+      "name": "Image Navigation",
+      "kind": "nav",
+      "description": "Active image row; export selection remains a separate checkbox in the app.",
+      "html": "<nav aria-label=\"图片列表\" class=\"ds-nav\"><button class=\"ds-row\" aria-current=\"true\"><span>证件照片.png<small>1200×1600 · 234 KB</small></span></button></nav>",
+      "css": ".ds-nav{padding:var(--space-2);}.ds-row{width:100%;min-height:76px;padding:var(--space-2);border:0;border-radius:var(--radius-control);background:var(--accent-subtle);color:var(--foreground);text-align:left;font:500 var(--text-sm)/1.5 var(--font-body);cursor:pointer;}.ds-row small{display:block;margin-top:var(--space-1);color:var(--text-secondary);font-size:var(--text-xs);font-weight:400;font-variant-numeric:tabular-nums;}.ds-row:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-strong) 72%,transparent);outline-offset:2px;}"
+    },
+    {
+      "name": "Segmented Selection",
+      "kind": "custom",
+      "description": "Arc grouped choices with a surface highlight; the app animates highlight travel.",
+      "html": "<div class=\"ds-segments\" role=\"group\" aria-label=\"水印布局\"><button aria-pressed=\"true\">平铺</button><button aria-pressed=\"false\">单个</button></div>",
+      "css": ".ds-segments{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--border);border-radius:var(--radius-control);background:var(--surface-muted);}.ds-segments button{min-height:var(--control-height-sm);padding:0 12px;border:1px solid transparent;border-radius:calc(var(--radius-control) - 4px);background:transparent;color:var(--text-muted);font:500 var(--text-sm)/1.4 var(--font-body);cursor:pointer;transition:color var(--duration-fast) var(--ease-standard);}.ds-segments button[aria-pressed=\"true\"]{background:var(--surface);border-color:var(--border);color:var(--foreground);box-shadow:var(--shadow-resting);}.ds-segments button:hover,.ds-segments button:active{color:var(--foreground);}.ds-segments button:focus-visible{outline:2px solid color-mix(in oklab,var(--accent-strong) 72%,transparent);outline-offset:2px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "本地图片水印工作台",
+    "overview": "Arc's neutral workspace keeps the user's image as the visual focus. Quiet surfaces, rounded controls, and compact Chinese labels connect immediate preview feedback with precise editing.\n\nThe shared identity is restrained and tactile: soft corners, thin boundaries, and moving selection highlights. The existing logo remains the identity asset; the interface uses self-hosted type with Chinese system fallbacks.",
+    "keyCharacteristics": [
+      "Neutral light and dark themes.",
+      "Rounded controls with clear selected states.",
+      "Image-led workspace and compact supporting typography.",
+      "Responsive controls with reduced-motion support."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Surface Rule",
+        "body": "Use the current theme's semantic variables for application chrome; watermark colors belong to user content.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stable Label Rule",
+        "body": "Selection changes color and highlight position without changing segmented-control label weight or scale.",
+        "section": "typography"
+      },
+      {
+        "name": "The Functional Depth Rule",
+        "body": "Use depth to distinguish floating controls and overlays from the editing surface; preserve the flat treatment of ordinary tool panels.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do reuse Arc primitives through the application adapters and semantic CSS variables.",
+      "Do preserve keyboard focus, reduced-motion behavior, and readable Chinese fallbacks.",
+      "Do keep primary actions, selected image state, and export selection visually distinct."
+    ],
+    "donts": [
+      "Don't treat unused vendor accents, gradients, charts, or the installed ThemeSwitch as established application patterns.",
+      "Don't turn preview transparency checks or user-selected watermark colors into interface decoration.",
+      "Don't apply the overlay touch-target spacing override globally."
+    ]
+  }
+}

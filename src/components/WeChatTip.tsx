@@ -19,8 +19,8 @@ export function WeChatTip() {
           <div className="flex items-start gap-2.5 px-4 py-2.5">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
             <p className="flex-1 text-xs leading-relaxed text-foreground-secondary">
-              微信内无法直接下载文件，可在「查看大图」后<b>长按图片保存</b>；批量导出请点右上角「···」选择
-              <b>在浏览器打开</b>。
+              微信内无法直接下载文件，可在「查看大图」后<strong className="font-medium">长按图片保存</strong>；批量导出请点右上角「···」选择
+              <strong className="font-medium">在浏览器打开</strong>。
             </p>
             <button
               type="button"

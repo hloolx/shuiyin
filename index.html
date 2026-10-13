@@ -30,6 +30,8 @@
           var t = localStorage.getItem('shuiyin:theme');
           var dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
           if (dark) document.documentElement.classList.add('dark');
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+          document.documentElement.dataset.accent = 'neutral';
         } catch (e) {}
       })();
     </script>

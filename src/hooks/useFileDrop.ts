@@ -13,6 +13,7 @@ export function useFileDrop(onFiles: (files: File[]) => void) {
     const enter = (e: DragEvent) => {
       if (!hasFiles(e)) return;
       e.preventDefault();
+      if (e.target instanceof Element && e.target.closest('[data-local-dropzone]')) return;
       depth.current += 1;
       setDragging(true);
     };
@@ -31,6 +32,7 @@ export function useFileDrop(onFiles: (files: File[]) => void) {
       e.preventDefault();
       depth.current = 0;
       setDragging(false);
+      if (e.target instanceof Element && e.target.closest('[data-local-dropzone]')) return;
       const files = Array.from(e.dataTransfer?.files ?? []);
       if (files.length) onFilesRef.current(files);
     };

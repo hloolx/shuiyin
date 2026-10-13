@@ -50,7 +50,7 @@ function ToastItem({ t }: { t: Toast }) {
             t.action!.onClick();
             dismissToast(t.id);
           }}
-          className="shrink-0 rounded-lg px-2 py-1 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+          className="shrink-0 min-h-11 rounded-lg px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
         >
           {t.action.label}
         </button>
@@ -59,7 +59,7 @@ function ToastItem({ t }: { t: Toast }) {
         type="button"
         aria-label="关闭通知"
         onClick={() => dismissToast(t.id)}
-        className={cn('shrink-0 rounded-lg p-1 text-foreground-tertiary transition-colors hover:bg-surface-2 hover:text-foreground')}
+        className={cn('shrink-0 min-h-11 min-w-11 flex items-center justify-center rounded-lg p-1 text-foreground-tertiary transition-colors hover:bg-surface-2 hover:text-foreground')}
       >
         <X className="h-4 w-4" />
       </button>

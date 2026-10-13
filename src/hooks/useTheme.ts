@@ -7,9 +7,10 @@ const media = () => window.matchMedia('(prefers-color-scheme: dark)');
 
 function apply(theme: Theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark');
+  document.documentElement.dataset.theme = theme;
   document
     .querySelectorAll('meta[name="theme-color"]')
-    .forEach((m) => m.setAttribute('content', theme === 'dark' ? '#0a0c10' : '#f6f7f9'));
+    .forEach((m) => m.setAttribute('content', theme === 'dark' ? '#171717' : '#f8f8f8'));
 }
 
 export function useTheme() {

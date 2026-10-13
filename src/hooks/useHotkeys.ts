@@ -30,6 +30,7 @@ export function useHotkeys(handlers: HotkeyHandlers, enabled = true) {
     let comparing = false;
 
     const down = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return;
       const h = ref.current;
       const mod = e.metaKey || e.ctrlKey;
       if (mod && e.key.toLowerCase() === 's') {
@@ -40,7 +41,7 @@ export function useHotkeys(handlers: HotkeyHandlers, enabled = true) {
       }
       if (isTyping(e.target) || mod || e.altKey) return;
       // 滑块获得焦点时方向键用于调值，不切换图片
-      const onRange = (e.target as HTMLInputElement | null)?.type === 'range';
+      const onRange = (e.target as HTMLElement | null)?.closest('input[type="range"], [role="slider"], [role="radio"], [role="group"]');
       switch (e.key) {
         case 'ArrowLeft':
           if (onRange) return;

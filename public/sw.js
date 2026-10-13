@@ -1,5 +1,5 @@
 // 版本号变化时会清理旧缓存
-const CACHE = 'shuiyin-v2';
+const CACHE = 'shuiyin-v2.1-arc';
 const PRECACHE = ['./', './index.html', './manifest.json', './images/favicon.ico', './images/logo108.png', './images/logo192.png', './images/logo512.png'];
 
 self.addEventListener('install', (event) => {

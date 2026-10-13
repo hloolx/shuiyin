@@ -5,6 +5,8 @@ import type { ImageItem, WatermarkSettings } from '../types';
 import { sourceCache } from '../core/image';
 import { renderComposite } from '../core/watermark';
 import { cn } from '../lib/utils';
+import { Button, type ButtonProps } from './ui/Button';
+import { motionTokens } from './arc/lib/motion-tokens';
 
 interface PreviewStageProps {
   item: ImageItem | null;
@@ -141,14 +143,14 @@ function StageCanvas({
   );
 }
 
-function ToolButton({ label, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { label: string }) {
+function ToolButton({ label, className, ...props }: ButtonProps & { label: string }) {
   return (
-    <button
+    <Button variant="ghost" size="icon"
       type="button"
       aria-label={label}
       title={label}
       className={cn(
-        'flex h-9 w-9 items-center justify-center rounded-full text-foreground-secondary transition-colors hover:bg-surface-2 hover:text-foreground disabled:pointer-events-none disabled:opacity-30',
+        'text-foreground-secondary',
         className,
       )}
       {...props}
@@ -211,6 +213,13 @@ export function PreviewStage({
   };
 
   const holdCompare = {
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onCompareChange(true); }
+    },
+    onKeyUp: (e: React.KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onCompareChange(false); }
+    },
+    onBlur: () => onCompareChange(false),
     onPointerDown: (e: React.PointerEvent) => {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
       onCompareChange(true);
@@ -223,7 +232,7 @@ export function PreviewStage({
 
   return (
     <section
-      className={cn('relative overflow-hidden rounded-3xl border border-border bg-surface shadow-card', className)}
+      className={cn('preview-surface relative overflow-hidden bg-surface', className)}
       aria-label="预览"
     >
       <div ref={boxRef} className="checker absolute inset-0">
@@ -236,7 +245,7 @@ export function PreviewStage({
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ type: 'spring', stiffness: 360, damping: 34 }}
+              transition={motionTokens.spring.smooth}
               className="absolute inset-0 flex items-start justify-center"
               style={{ paddingTop: PAD_TOP, paddingBottom: PAD_BOTTOM, paddingLeft: PAD_X, paddingRight: PAD_X }}
               drag={swipe && total > 1 ? 'x' : false}
@@ -275,10 +284,10 @@ export function PreviewStage({
       {item && (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center px-2">
           <m.div
-            className="pointer-events-auto flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-border bg-surface/90 p-1 shadow-float backdrop-blur-xl no-scrollbar"
+            className="preview-toolbar pointer-events-auto flex max-w-full items-center gap-0.5 overflow-x-auto no-scrollbar"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
+            transition={motionTokens.spring.smooth}
           >
             {total > 1 && (
               <>

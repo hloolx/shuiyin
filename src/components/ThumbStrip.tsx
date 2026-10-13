@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import type { ImageItem } from '../types';
 import { cn } from '../lib/utils';
+import { motionTokens } from './arc/lib/motion-tokens';
 
 interface ThumbStripProps {
   items: ImageItem[];
@@ -20,7 +21,7 @@ export function ThumbStrip({ items, currentId, onSelect, onAdd }: ThumbStripProp
     const list = listRef.current;
     const el = list?.querySelector<HTMLElement>(`[data-id="${currentId}"]`);
     if (!list || !el) return;
-    list.scrollTo({ left: el.offsetLeft - list.clientWidth / 2 + el.clientWidth / 2, behavior: 'smooth' });
+    list.scrollTo({ left: el.offsetLeft - list.clientWidth / 2 + el.clientWidth / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }, [currentId]);
 
   return (
@@ -41,7 +42,7 @@ export function ThumbStrip({ items, currentId, onSelect, onAdd }: ThumbStripProp
               <m.span
                 layoutId="thumb-active"
                 className="absolute inset-0 rounded-xl border-2 border-primary"
-                transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                transition={motionTokens.spring.smooth}
               />
             )}
             <span className={cn('block h-full w-full overflow-hidden rounded-lg bg-surface-2', !item.selected && 'opacity-40')}>

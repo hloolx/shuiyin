@@ -174,7 +174,7 @@ npm run deploy     # 构建、上传静态资源并绑定自定义域名
 本项目基于 [joyqi/sfz](https://github.com/joyqi/sfz) 优化改进，感谢原项目作者的贡献。
 
 - 原项目: [joyqi/sfz](https://github.com/joyqi/sfz)
-- UI 设计系统: [shadcn/ui](https://ui.shadcn.com/)
+- UI 设计系统: [Arc](https://uiarc.dev/) 免费开源组件（MIT），通过 shadcn registry 安装。许可见 [docs/ARC-LICENSE.txt](docs/ARC-LICENSE.txt)。
 
 ## 📄 开源协议
 
