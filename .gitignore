@@ -25,3 +25,8 @@ dist-ssr
 
 # Claude AI
 .claude
+
+# Cloudflare local state and credentials
+.wrangler
+.dev.vars*
+.env*

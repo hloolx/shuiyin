@@ -7,8 +7,8 @@
 <p align="center">🎨 强大的批量图片水印在线工具</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React-18.3-blue.svg?logo=react" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-5.6-blue.svg?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/React-19-blue.svg?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.9-blue.svg?logo=typescript" alt="TypeScript">
   <img src="https://img.shields.io/badge/Vite-7.0-646CFF.svg?logo=vite" alt="Vite">
   <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?logo=tailwindcss" alt="Tailwind CSS">
   <img src="https://img.shields.io/badge/license-GPL--3.0-green.svg" alt="License">
@@ -16,164 +16,106 @@
 </p>
 
 <p align="center">🎮 在线演示：
-  <a href="https://in.15o.cc" target="_blank">
-  https://in.15o.cc
+  <a href="https://in.wein.dev" target="_blank">
+  https://in.wein.dev
   </a>
 </p>
 
 ## 📖 简介
 
-现代化的批量图片水印工具，基于 React + TypeScript 重构自 [joyqi/sfz](https://github.com/joyqi/sfz)。完全本地处理，保护隐私，支持批量导出和 ZIP 打包。专为需要批量添加水印的用户设计，提供丰富的自定义选项和便捷的操作体验。
+现代化的批量图片水印工具，基于 React + TypeScript 重构自 [joyqi/sfz](https://github.com/joyqi/sfz)。图片完全在浏览器本地处理，不上传任何数据。适合给身份证、证件照复印件加「仅供 XX 使用」水印，也适合作品图版权签名。
+
+> v2.0 的需求拆解、问题清单与优化前后实测数据见 [docs/需求拆解与优化方案.md](docs/需求拆解与优化方案.md)。
 
 ## ✨ 特性
 
-- 🔒 **完全本地处理** - 所有操作都在浏览器中完成，不上传任何数据
-- 🎨 **实时预览** - 即时查看水印效果
-- 📦 **批量操作** - 支持同时处理多张图片
-- 💾 **灵活导出** - 单张下载或批量打包为 ZIP
-- 🎯 **拖拽上传** - 支持拖拽文件到页面上传
-- 🎨 **自定义水印** - 可调整文字、颜色、透明度、角度、间隔、大小
-- 📱 **响应式设计** - 完美适配桌面和移动设备
+- 🔒 **完全本地处理** - 不上传、不留存，安装为 PWA 后断网可用
+- ⚡ **实时预览不卡顿** - 预览按屏幕分辨率渲染，4000×3000 大图拖动滑块不掉帧；按住空格对比原图
+- 🧩 **两种排列** - 平铺满图（可错位排列，更难被裁掉）或单个水印（九宫格定位，自动留安全边距）
+- 📝 **常用文案模板** - 「仅供XX使用，他用无效」「复印无效」等一键填入
+- 📦 **批量导出** - 保持原始分辨率，可选原格式 / JPG / PNG / WebP 与质量；多张自动打包 ZIP，可随时取消
+- 🖱️ **多种导入方式** - 点击、拖拽到页面任意位置、Ctrl/⌘+V 粘贴截图、手机拍照
+- ↩️ **可撤销** - 删除图片、恢复默认设置都能撤销；设置自动保存
+- 📱 **移动端优化** - 预览吸顶、左右滑动切图、长按或系统分享保存到相册，兼容微信内置浏览器
+- 🌗 **暗色模式** - 跟随系统，可手动切换
+- ✨ **细腻动效** - 基于 Motion 的弹簧动画，系统开启「减少动态效果」时自动降级
 
 ## 🛠️ 技术栈
 
-- **React 18** - UI 框架
-- **TypeScript** - 类型安全
-- **Vite** - 快速构建工具
-- **Tailwind CSS v3** - 稳定的样式框架
-- **shadcn/ui** - UI 组件库风格
-- **JSZip** - ZIP 文件生成
-- **file-saver** - 文件下载
-- **lucide-react** - 图标库
+- **React 19** + **TypeScript** + **Vite**
+- **Tailwind CSS 3**（CSS 变量主题，支持暗色模式）
+- **Motion** - 动画（特性包按需加载）
+- **JSZip**（按需加载）+ **file-saver** - 打包与下载
+- **lucide-react** - 图标
 
 ## 📦 项目结构
 
 ```
-react-watermark/
-├── src/
-│   ├── components/          # UI 组件
-│   │   ├── ui/             # 基础 UI 组件
-│   │   │   ├── Button.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Label.tsx
-│   │   │   ├── Slider.tsx
-│   │   │   └── Checkbox.tsx
-│   │   ├── Header.tsx      # 头部
-│   │   ├── ImageUpload.tsx # 图片上传
-│   │   ├── ImageList.tsx   # 图片列表
-│   │   ├── WatermarkSettings.tsx  # 水印设置
-│   │   ├── PreviewCanvas.tsx      # 预览区域
-│   │   ├── DownloadButtons.tsx    # 下载按钮
-│   │   ├── ProgressModal.tsx      # 进度弹窗
-│   │   └── Footer.tsx      # 页脚
-│   ├── hooks/              # 自定义 Hooks
-│   │   ├── useImageManager.ts  # 图片管理
-│   │   └── useWatermark.ts     # 水印逻辑
-│   ├── utils/              # 工具函数
-│   │   ├── canvas.ts       # Canvas 操作
-│   │   ├── download.ts     # 下载功能
-│   │   └── file.ts         # 文件处理
-│   ├── types/              # TypeScript 类型定义
-│   │   └── index.ts
-│   ├── lib/                # 库工具
-│   │   └── utils.ts        # 通用工具
-│   ├── App.tsx             # 主应用
-│   ├── main.tsx            # 入口文件
-│   └── index.css           # 全局样式
-├── public/                 # 静态资源
-│   └── images/            # 图标资源
-├── index.html             # HTML 模板
-├── package.json           # 依赖配置
-├── tsconfig.json          # TypeScript 配置
-├── vite.config.ts         # Vite 配置
-├── tailwind.config.js     # Tailwind 配置
-└── postcss.config.js      # PostCSS 配置
+src/
+├── core/                  # 与 React 无关的纯逻辑
+│   ├── watermark.ts       # 水印绘制（平铺 / 单个）
+│   ├── image.ts           # 图片解码、原图 LRU 缓存、缩略图
+│   └── export.ts          # 原图渲染、批量 ZIP、文件命名
+├── hooks/                 # 图片列表状态、设置持久化、拖拽粘贴、快捷键、主题
+├── components/
+│   ├── Landing.tsx        # 首页
+│   ├── PreviewStage.tsx   # 预览舞台
+│   ├── SettingsPanel.tsx  # 水印与导出设置
+│   ├── ImageListPanel.tsx # 图片列表（桌面侧栏 / 移动抽屉）
+│   ├── ...                # 导出弹窗、大图查看器、通知、拖拽遮罩等
+│   └── ui/                # Button、Slider、Segmented、Switch、CheckMark
+├── lib/                   # 常量、设置校验、toast、工具函数
+├── types/
+├── App.tsx
+└── main.tsx
+public/
+├── sw.js                  # Service Worker（页面网络优先、静态资源缓存优先）
+├── manifest.json
+└── images/
 ```
 
 ## 🚀 开始使用
 
-### 安装依赖
-
 ```bash
 npm install
+npm run dev       # 开发模式，默认 http://localhost:5173
+npm run build     # 生产构建，产物在 dist/
+npm run preview   # 预览构建产物
 ```
 
-### 开发模式
+`vite.config.ts` 使用相对路径 `base: './'`，可部署在任意子目录。
+
+### 部署到 Cloudflare Workers
+
+生产地址：**https://in.wein.dev**，Worker 名称：`shuiyin`。
+使用 Workers Static Assets 托管 `dist/`，图片处理仍全部在用户浏览器内完成。
 
 ```bash
-npm run dev
+npm ci
+npx wrangler login  # 首次部署时登录有 wein.dev 权限的 Cloudflare 账号
+npm run deploy     # 构建、上传静态资源并绑定自定义域名
 ```
 
-应用将运行在 `http://localhost:5173` (或其他可用端口)
-
-### 生产构建
-
-```bash
-npm run build
-```
-
-构建产物将生成在 `dist` 目录
-
-### 预览构建
-
-```bash
-npm run preview
-```
+部署配置保存在 `wrangler.jsonc`，域名绑定由 Cloudflare 管理 DNS 与 HTTPS 证书。
+`public/_headers` 让页面和 Service Worker 每次检查更新，带哈希的 JS/CSS 使用长期缓存。
+自动化环境可通过 `CLOUDFLARE_API_TOKEN` 提供部署凭据，不要将令牌写进仓库。
 
 ## 💡 使用说明
 
-1. **上传图片**
-   - 点击上传区域选择图片
-   - 或直接拖拽图片到上传区域
-   - 支持 PNG、JPEG、GIF、WebP 格式
+1. **添加图片**：点击选择、拖到页面任意位置、或直接粘贴截图；手机上可直接拍照。
+2. **设置水印**：输入文字或点选模板，调整颜色、不透明度、字号；选择平铺或单个水印。
+3. **预览**：左右箭头 / 键盘 ← → / 手机左右滑动切换图片；按住 👁 或空格对比原图；点击预览图查看原始尺寸。
+4. **导出**：勾选要导出的图片（默认全选），点「导出所选」。只选一张时直接下载图片，多张打包为 ZIP。
 
-2. **设置水印**
-   - 输入水印文字（最多30个字符）
-   - 调整颜色、透明度、旋转角度
-   - 调整水印间隔和字号大小
-   - 开启实时预览自动更新效果
+### 键盘快捷键
 
-3. **预览效果**
-   - 在右侧预览区查看水印效果
-   - 点击图片可直接下载当前图片
-
-4. **批量下载**
-   - 选中需要的图片（默认全选）
-   - 点击"下载选中图片"批量导出为 ZIP
-   - 或点击"导出全部为 ZIP"导出所有图片
-
-## 🎯 核心功能实现
-
-### 组件化设计
-
-所有 UI 元素都采用可复用的组件设计，遵循单一职责原则：
-
-- **UI 组件** - 通用的 Button、Card、Input 等基础组件
-- **业务组件** - ImageUpload、ImageList、WatermarkSettings 等功能组件
-- **容器组件** - App.tsx 负责状态管理和组件编排
-
-### 自定义 Hooks
-
-- **useImageManager** - 管理图片列表、选择、删除等操作
-- **useWatermark** - 处理水印设置、预览生成、Canvas 缓存等
-
-### 工具函数模块
-
-- **canvas.ts** - Canvas 操作、水印绘制、格式转换
-- **download.ts** - 单张/批量下载、ZIP 打包
-- **file.ts** - 文件验证、过滤、ID 生成
-
-### 类型安全
-
-使用 TypeScript 提供完整的类型定义，提高代码可维护性和开发体验。
-
-## 🎨 设计特点
-
-- **现代化 UI** - 采用 Tailwind CSS + shadcn/ui 风格，简洁美观
-- **响应式布局** - 完美适配桌面、平板、手机
-- **交互反馈** - 悬停效果、加载状态、进度提示
-- **无障碍支持** - 语义化 HTML、键盘导航、ARIA 标签
+| 按键 | 功能 |
+|---|---|
+| `←` / `→` | 上一张 / 下一张 |
+| 按住 `空格` | 对比原图 |
+| `Ctrl/⌘ + S` | 下载当前图片 |
+| `Ctrl/⌘ + Shift + S` | 导出所选 |
+| `Delete` | 移除当前图片（可撤销） |
 
 ## 📝 重构说明
 
@@ -203,7 +145,7 @@ npm run preview
 
 | 特性 | 原项目 (sfz) | 本项目 |
 |------|--------|-------------|
-| 框架 | 原生 JS + CoffeeScript | React 18 + TypeScript |
+| 框架 | 原生 JS + CoffeeScript | React 19 + TypeScript |
 | 样式 | 原生 CSS | Tailwind CSS 3.4 |
 | 组件化 | 无 | 完全组件化 |
 | 类型安全 | 无 | TypeScript 严格模式 |

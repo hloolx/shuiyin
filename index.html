@@ -2,35 +2,41 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-    <!-- 移动端视口优化 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="批量图片水印工具 - 完全本地处理，隐私安全，支持批量操作和实时预览" />
-    <!-- 禁止电话号码自动检测 -->
-    <meta name="format-detection" content="telephone=no" />
-    <!-- 主题色 -->
-    <meta name="theme-color" content="#1e40af" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
-    <!-- 苹果设备优化 -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="水印工具" />
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json" />
-    <!-- 苹果图标 -->
-    <link rel="apple-touch-icon" href="/images/logo192.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/images/logo152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/logo180.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="/images/logo167.png" />
-    <!-- 启动画面 -->
-    <link rel="apple-touch-startup-image" href="/images/splash.png" />
-    <!-- 预连接优化 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>批量图片水印工具 - 本地处理 · 隐私安全</title>
+    <meta name="description" content="批量图片水印工具：身份证、证件、照片一键加水印。完全在浏览器本地处理，不上传任何数据，支持平铺/单个水印、实时预览、批量导出 ZIP。" />
+    <meta name="keywords" content="水印,图片水印,批量水印,身份证水印,证件水印,在线水印,本地处理" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0c10" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content="批量图片水印工具" />
+    <meta property="og:url" content="https://in.wein.dev/" />
+    <meta property="og:description" content="完全本地处理的图片水印工具，隐私安全，支持批量导出。" />
+    <meta property="og:image" content="https://in.wein.dev/images/logo512.png" />
+    <link rel="canonical" href="https://in.wein.dev/" />
+
+    <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./images/logo192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="水印工具" />
+
+    <!-- 首帧前确定主题，避免暗色模式闪白 -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('shuiyin:theme');
+          var dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>本工具需要启用 JavaScript 才能运行。</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

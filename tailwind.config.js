@@ -1,61 +1,67 @@
 /** @type {import('tailwindcss').Config} */
+
+// 颜色全部走 CSS 变量（RGB 三元组），以支持暗色模式和 /透明度 修饰符
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        // 极简主义配色
-        background: '#FAFAFA',
-        surface: '#FFFFFF',
-        border: 'rgba(0, 0, 0, 0.06)',
-        'border-hover': 'rgba(0, 0, 0, 0.12)',
-        primary: {
-          DEFAULT: '#1e40af',
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+        background: v('bg'),
+        surface: {
+          DEFAULT: v('surface'),
+          2: v('surface-2'),
         },
-        muted: {
-          DEFAULT: '#64748b',
-          foreground: '#64748b',
+        border: {
+          DEFAULT: v('border'),
+          strong: v('border-strong'),
         },
         foreground: {
-          DEFAULT: '#0f172a',
-          secondary: '#475569',
-          tertiary: '#94a3b8',
+          DEFAULT: v('fg'),
+          secondary: v('fg-2'),
+          tertiary: v('fg-3'),
         },
+        primary: {
+          DEFAULT: v('primary'),
+          fg: v('primary-fg'),
+        },
+        danger: v('danger'),
+        success: v('success'),
+        warning: v('warning'),
       },
       borderRadius: {
-        '2xl': '16px',
-        '3xl': '20px',
-        '4xl': '24px',
+        '4xl': '2rem',
       },
       boxShadow: {
-        'subtle': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
-        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)',
-        'elevated': '0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
-      },
-      spacing: {
-        '18': '4.5rem',
-        '22': '5.5rem',
+        card: '0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px -6px rgb(15 23 42 / 0.08)',
+        float: '0 12px 40px -12px rgb(15 23 42 / 0.28), 0 2px 6px rgb(15 23 42 / 0.06)',
+        ring: '0 0 0 4px rgb(var(--primary) / 0.16)',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: [
+          '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+          'Microsoft YaHei', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif',
+        ],
       },
       transitionTimingFunction: {
-        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        smooth: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        'dash-flow': {
+          to: { strokeDashoffset: '-24' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.6s linear infinite',
+        'dash-flow': 'dash-flow 1s linear infinite',
       },
     },
   },
   plugins: [],
-}
+};

@@ -1,508 +1,618 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  Github, 
-  Sparkles,
-  Zap,
-  Shield,
-  Download,
-  FileArchive,
-  Images,
-  Menu,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Upload,
-  AlertCircle
-} from 'lucide-react';
-import { ImageUpload } from './components/ImageUpload';
-import { SidebarImageList } from './components/SidebarImageList';
-import { WatermarkSettings } from './components/WatermarkSettings';
-import { PreviewCanvas, GlobalDragOverlay } from './components/PreviewCanvas';
-import { ProgressModal } from './components/ProgressModal';
-import { useImageManager } from './hooks/useImageManager';
-import { useWatermark } from './hooks/useWatermark';
-import { useTouchGesture } from './hooks/useTouchGesture';
-import { useGlobalFileHandler, usePasteHandler } from './hooks/useGlobalFileHandler';
-import type { ProgressState } from './types';
-import { downloadCanvas, downloadMultipleAsZip } from './utils/download';
-import { generateFileName } from './utils/canvas';
+import { AnimatePresence, LazyMotion, MotionConfig, m, type Variants } from 'motion/react';
+import { useCallback, useRef, useState } from 'react';
+import { saveAs } from 'file-saver';
+import { Download, FileArchive, Github, Keyboard, Menu, Moon, Plus, Sun, X } from 'lucide-react';
+import type { ExportOptions, ExportProgress, WatermarkSettings } from './types';
+import { useImageStore } from './hooks/useImageStore';
+import { usePersistentState } from './hooks/usePersistentState';
+import { useTheme } from './hooks/useTheme';
+import { useCanHover, useIsDesktop } from './hooks/useMediaQuery';
+import { useFileDrop } from './hooks/useFileDrop';
+import { useHotkeys } from './hooks/useHotkeys';
+import { blobToDataURL, downloadImage, exportImages, renderImage } from './core/export';
+import { ACCEPT_TYPES, APP_VERSION, DEFAULT_EXPORT, DEFAULT_SETTINGS, STORAGE_KEYS } from './lib/constants';
+import { sanitizeExport, sanitizeSettings } from './lib/settings';
+import { toast } from './lib/toast';
+import { formatBytes, isMac, isWeChat } from './lib/utils';
+import { Button } from './components/ui/Button';
+import { Brand } from './components/Brand';
+import { Landing } from './components/Landing';
+import { ImageListPanel } from './components/ImageListPanel';
+import { PreviewStage } from './components/PreviewStage';
+import { SettingsPanel } from './components/SettingsPanel';
+import { ThumbStrip } from './components/ThumbStrip';
+import { Drawer } from './components/Drawer';
+import { DropOverlay } from './components/DropOverlay';
+import { ExportDialog } from './components/ExportDialog';
+import { Viewer, type ViewerState } from './components/Viewer';
+import { Toaster } from './components/Toaster';
+import { WeChatTip } from './components/WeChatTip';
 
-function App() {
-  const imageManager = useImageManager();
-  const watermark = useWatermark(imageManager.currentImage);
-  const [showUpload, setShowUpload] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isWechat, setIsWechat] = useState(false);
-  const [progress, setProgress] = useState<ProgressState>({
-    isOpen: false,
-    current: 0,
-    total: 0,
-    fileName: '',
-  });
+const GITHUB_URL = 'https://github.com/hloolx/shuiyin';
+const MOD = isMac ? '⌘' : 'Ctrl';
+const SHORTCUTS: [string, string][] = [
+  ['← / →', '切换图片'],
+  ['按住 空格', '对比原图'],
+  [`${MOD} + S`, '下载当前'],
+  [`${MOD} + Shift + S`, '导出所选'],
+  ['Delete', '移除当前'],
+];
 
-  // 检测是否在微信浏览器中
-  useEffect(() => {
-    const checkWechat = () => {
-      const ua = navigator.userAgent.toLowerCase();
-      return ua.includes('micromessenger') || ua.includes('wechat');
-    };
-    setIsWechat(checkWechat());
-  }, []);
+const spring = { type: 'spring', stiffness: 260, damping: 28 } as const;
+const fromLeft: Variants = { hidden: { x: -32, opacity: 0 }, show: { x: 0, opacity: 1, transition: spring } };
+const fromRight: Variants = { hidden: { x: 32, opacity: 0 }, show: { x: 0, opacity: 1, transition: { ...spring, delay: 0.06 } } };
+const fromTop: Variants = { hidden: { y: -12, opacity: 0 }, show: { y: 0, opacity: 1, transition: spring } };
+const zoomIn: Variants = { hidden: { scale: 0.97, opacity: 0 }, show: { scale: 1, opacity: 1, transition: { ...spring, delay: 0.03 } } };
 
-  // 全局文件处理
-  const handleFilesSelect = useCallback((files: FileList | File[]) => {
-    imageManager.addImages(files);
-    setShowUpload(false);
-  }, [imageManager]);
+const loadMotionFeatures = () => import('./lib/motion-features').then((mod) => mod.default);
 
-  // 全局拖入处理
-  const { isDragging: isGlobalDragging } = useGlobalFileHandler({
-    onFilesSelect: handleFilesSelect,
-    disabled: false,
-  });
+const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+const shortName = (name: string) => (name.length > 18 ? `${name.slice(0, 16)}…` : name);
 
-  // 粘贴处理
-  usePasteHandler({
-    onFilesSelect: handleFilesSelect,
-    disabled: false,
-  });
-
-  // 检测移动端
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // 下载当前图片
-  const handleDownloadCurrent = () => {
-    if (!watermark.previewCanvas || !imageManager.currentImage) return;
-
-    const fileName = generateFileName(imageManager.currentImage.file.name);
-    downloadCanvas(watermark.previewCanvas, fileName);
-  };
-
-  // 下载选中的图片
-  const handleDownloadSelected = async () => {
-    const selectedImages = imageManager.selectedImages;
-    if (selectedImages.length === 0) return;
-
-    setProgress({
-      isOpen: true,
-      current: 0,
-      total: selectedImages.length,
-      fileName: '',
-    });
-
-    try {
-      const canvases: HTMLCanvasElement[] = [];
-      const fileNames: string[] = [];
-
-      for (let i = 0; i < selectedImages.length; i++) {
-        const image = selectedImages[i];
-        setProgress({
-          isOpen: true,
-          current: i + 1,
-          total: selectedImages.length,
-          fileName: image.file.name,
-        });
-
-        const canvas = await watermark.generateCanvas(image);
-        canvases.push(canvas);
-        fileNames.push(image.file.name);
-      }
-
-      await downloadMultipleAsZip(canvases, fileNames);
-    } catch (error) {
-      console.error('Failed to download images:', error);
-      alert('下载失败，请重试！');
-    } finally {
-      setProgress({
-        isOpen: false,
-        current: 0,
-        total: 0,
-        fileName: '',
-      });
-    }
-  };
-
-  // 导出全部为 ZIP
-  const handleDownloadAll = async () => {
-    const allImages = imageManager.images;
-    if (allImages.length === 0) return;
-
-    setProgress({
-      isOpen: true,
-      current: 0,
-      total: allImages.length,
-      fileName: '',
-    });
-
-    try {
-      const canvases: HTMLCanvasElement[] = [];
-      const fileNames: string[] = [];
-
-      for (let i = 0; i < allImages.length; i++) {
-        const image = allImages[i];
-        setProgress({
-          isOpen: true,
-          current: i + 1,
-          total: allImages.length,
-          fileName: image.file.name,
-        });
-
-        const canvas = await watermark.generateCanvas(image);
-        canvases.push(canvas);
-        fileNames.push(image.file.name);
-      }
-
-      await downloadMultipleAsZip(canvases, fileNames);
-    } catch (error) {
-      console.error('Failed to download images:', error);
-      alert('下载失败，请重试！');
-    } finally {
-      setProgress({
-        isOpen: false,
-        current: 0,
-        total: 0,
-        fileName: '',
-      });
-    }
-  };
-
-  const hasImages = imageManager.images.length > 0;
-  const selectedCount = imageManager.selectedImages.length;
-
-  // 切换侧边栏
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-  // 关闭侧边栏（移动端）
-  const closeSidebar = () => {
-    if (isMobile) setSidebarOpen(false);
-  };
-
-  // 切换到上一张图片
-  const goToPrevImage = useCallback(() => {
-    if (imageManager.currentIndex > 0) {
-      imageManager.selectImage(imageManager.currentIndex - 1);
-    }
-  }, [imageManager]);
-
-  // 切换到下一张图片
-  const goToNextImage = useCallback(() => {
-    if (imageManager.currentIndex < imageManager.images.length - 1) {
-      imageManager.selectImage(imageManager.currentIndex + 1);
-    }
-  }, [imageManager]);
-
-  // 手势支持 - 仅在移动端启用
-  const swipeRef = useTouchGesture(({ direction }) => {
-    if (!isMobile) return;
-    if (direction === 'right' && imageManager.currentIndex > 0) {
-      goToPrevImage();
-    } else if (direction === 'left' && imageManager.currentIndex < imageManager.images.length - 1) {
-      goToNextImage();
-    }
-  }, { threshold: 50 });
-
-  // 预览区域引用
-  const previewRef = useRef<HTMLDivElement>(null);
-  // 文件输入引用（用于二次上传）
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
+function ThemeButton({ theme, onToggle }: { theme: 'light' | 'dark'; onToggle: () => void }) {
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* 移动端遮罩层 */}
-      {isMobile && sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
-          onClick={closeSidebar}
-        />
-      )}
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={onToggle}
+      aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
+      title={theme === 'dark' ? '浅色模式' : '深色模式'}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <m.span
+          key={theme}
+          initial={{ rotate: -90, scale: 0.4, opacity: 0 }}
+          animate={{ rotate: 0, scale: 1, opacity: 1 }}
+          exit={{ rotate: 90, scale: 0.4, opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          {theme === 'dark' ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
+        </m.span>
+      </AnimatePresence>
+    </Button>
+  );
+}
 
-      {/* 左侧边栏 */}
-      <aside 
-        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-border bg-surface transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {/* Logo区域 */}
-        <div className="flex h-16 items-center gap-3 border-b border-border px-4 lg:px-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <Sparkles className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-base font-semibold text-foreground truncate">水印工具</h1>
-            <p className="text-xs text-muted-foreground">Clean & Simple</p>
-          </div>
-          {/* 移动端关闭按钮 */}
-          {isMobile && (
-            <button 
-              onClick={closeSidebar}
-              className="p-2 rounded-lg hover:bg-foreground/5"
-            >
-              <X className="h-5 w-5 text-muted-foreground" />
-            </button>
-          )}
-        </div>
+function GithubLink() {
+  return (
+    <a
+      href={GITHUB_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="GitHub 开源地址"
+      title="GitHub"
+      className="flex h-10 w-10 items-center justify-center rounded-xl text-foreground-secondary transition-colors hover:bg-surface-2 hover:text-foreground"
+    >
+      <Github className="h-[18px] w-[18px]" />
+    </a>
+  );
+}
 
-        {/* 图片列表区域 */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {!hasImages ? (
-            <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-foreground/5">
-                <Images className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <p className="mt-4 text-sm font-medium text-foreground-secondary">暂无图片</p>
-              <p className="mt-1 text-xs text-muted-foreground">上传图片开始处理</p>
-            </div>
-          ) : (
-            <>
-              {/* 侧边栏添加图片按钮 */}
-              <div className="p-3 border-b border-border">
-                <button
-                  onClick={() => {
-                    fileInputRef.current?.click();
-                    if (isMobile) closeSidebar();
-                  }}
-                  className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-primary/10 text-primary text-sm font-medium transition-all hover:bg-primary/20 active:scale-95"
-                >
-                  <Upload className="h-4 w-4" />
-                  <span>添加更多图片</span>
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <SidebarImageList
-                  images={imageManager.images}
-                  currentIndex={imageManager.currentIndex}
-                  onSelect={(index) => {
-                    imageManager.selectImage(index);
-                    closeSidebar();
-                  }}
-                  onRemove={imageManager.removeImage}
-                  onToggleSelection={imageManager.toggleImageSelection}
-                  onClearAll={imageManager.clearAll}
-                />
-              </div>
-            </>
-          )}
-        </div>
+/** 数字变化时轻微弹一下 */
+function CountBadge({ value }: { value: number }) {
+  return (
+    <m.span
+      key={value}
+      initial={{ scale: 0.6, opacity: 0.4 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+      className="tabular inline-flex min-w-5 items-center justify-center rounded-full bg-white/20 px-1.5 text-xs"
+    >
+      {value}
+    </m.span>
+  );
+}
 
-        {/* 特色标签 - 桌面端显示 */}
-        <div className="hidden lg:block border-t border-border p-4">
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Zap className="h-3.5 w-3.5 flex-shrink-0" />
-              <span>完全本地处理，数据不上传</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Shield className="h-3.5 w-3.5 flex-shrink-0" />
-              <span>隐私安全，断网也能使用</span>
-            </div>
-          </div>
-        </div>
+function Credits() {
+  return (
+    <>
+      v{APP_VERSION} · GPL-3.0 · 基于{' '}
+      <a className="underline-offset-2 hover:underline" href="https://github.com/joyqi/sfz" target="_blank" rel="noopener noreferrer">
+        joyqi/sfz
+      </a>{' '}
+      · 作者{' '}
+      <a className="underline-offset-2 hover:underline" href="https://github.com/hloolx" target="_blank" rel="noopener noreferrer">
+        阿懒同学
+      </a>
+    </>
+  );
+}
 
-        {/* 底部信息 */}
-        <div className="border-t border-border p-4">
-          <a
-            href="https://github.com/hloolx/shuiyin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+function SidebarFooter() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-t border-border px-4 py-3">
+      <AnimatePresence initial={false}>
+        {open && (
+          <m.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
           >
-            <Github className="h-4 w-4" />
-            <span>开源项目</span>
-          </a>
-          <p className="mt-2 px-3 text-xs text-foreground-tertiary">
-            v1.0.2 · GPL-3.0 · 阿懒同学
-          </p>
-        </div>
-      </aside>
-
-      {/* 主内容区 */}
-      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarOpen && !isMobile ? 'lg:ml-72' : ''}`}>
-        {/* 微信浏览器提示 */}
-        {isWechat && (
-          <div className="sticky top-0 z-40 bg-amber-50 border-b border-amber-200 px-4 py-3">
-            <div className="flex items-start gap-3 max-w-5xl mx-auto">
-              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-amber-800">检测到您正在使用微信内置浏览器</p>
-                <p className="text-xs text-amber-700 mt-1">为获得最佳体验，请点击右上角菜单，选择「在浏览器打开」</p>
-              </div>
-            </div>
-          </div>
+            {SHORTCUTS.map(([keys, desc]) => (
+              <li key={desc} className="flex items-center justify-between py-1 text-xs text-foreground-secondary">
+                <span>{desc}</span>
+                <kbd className="rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-[11px] text-foreground-tertiary">
+                  {keys}
+                </kbd>
+              </li>
+            ))}
+            <li className="h-2" />
+          </m.ul>
         )}
-        
-        {/* 顶部栏 */}
-        <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-border bg-surface/80 px-4 sm:px-6 lg:px-8 backdrop-blur-xl">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* 移动端菜单按钮 */}
-            <button
-              onClick={toggleSidebar}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-foreground/5 transition-colors"
-            >
-              {sidebarOpen ? (
-                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <Menu className="h-5 w-5 text-muted-foreground" />
-              )}
-            </button>
-            
-            <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-semibold text-foreground truncate">批量图片水印工具</h2>
-              <p className="hidden sm:block text-xs text-muted-foreground truncate">安全、高效、简洁的本地水印处理方案</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {hasImages && (
-              <>
-
-                <button
-                  onClick={handleDownloadSelected}
-                  disabled={selectedCount === 0}
-                  className="inline-flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl bg-foreground/5 px-3 sm:px-4 text-sm font-medium text-foreground transition-all hover:bg-foreground/10 disabled:opacity-40"
-                >
-                  <Download className="h-4 w-4" />
-                  <span className="hidden sm:inline">下载选中</span>
-                  <span className="sm:hidden">下载</span>
-                  {selectedCount > 0 && (
-                    <span className="rounded-full bg-foreground/10 px-1.5 py-0.5 text-xs">
-                      {selectedCount}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  onClick={handleDownloadAll}
-                  disabled={selectedCount === 0}
-                  className="inline-flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-transparent px-3 sm:px-4 text-sm font-medium text-foreground transition-all hover:bg-foreground/5 hover:border-border-hover disabled:opacity-40"
-                >
-                  <FileArchive className="h-4 w-4" />
-                  <span className="hidden sm:inline">导出 ZIP</span>
-                  <span className="sm:hidden">ZIP</span>
-                </button>
-              </>
-            )}
-          </div>
-        </header>
-
-        {/* 内容区域 */}
-        <div className="p-4 sm:p-6 lg:p-8 pb-safe">
-          <div className="mx-auto max-w-5xl">
-            {/* 上传区域 - 没有图片时显示 */}
-            {(showUpload || !hasImages) && (
-              <div className="mb-6 lg:mb-8">
-                <ImageUpload onFilesSelect={handleFilesSelect} />
-              </div>
-            )}
-
-            {/* 有图片时的布局 */}
-            {hasImages && (
-              <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-[minmax(0,340px)_1fr] xl:grid-cols-[minmax(0,380px)_1fr]">
-                {/* 左侧：水印设置 */}
-                <div className="min-w-0 overflow-hidden">
-                  <WatermarkSettings
-                    settings={watermark.settings}
-                    onSettingsChange={watermark.updateSettings}
-                  />
-                </div>
-
-                {/* 右侧：预览 */}
-                <div 
-                  ref={(el) => {
-                    previewRef.current = el;
-                    if (isMobile) swipeRef(el);
-                  }}
-                  className="relative"
-                >
-                  {/* 移动端图片切换提示 */}
-                  {isMobile && imageManager.images.length > 1 && (
-                    <div className="absolute top-2 left-0 right-0 z-10 flex justify-between px-2 pointer-events-none">
-                      {imageManager.currentIndex > 0 && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-surface/80 backdrop-blur-sm px-2 py-1 rounded-full">
-                          <ChevronLeft className="h-3 w-3" />
-                          左滑上一张
-                        </div>
-                      )}
-                      {imageManager.currentIndex < imageManager.images.length - 1 && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-surface/80 backdrop-blur-sm px-2 py-1 rounded-full ml-auto">
-                          右滑下一张
-                          <ChevronRight className="h-3 w-3" />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  <PreviewCanvas
-                    canvas={watermark.previewCanvas}
-                    isLoading={watermark.isLoading}
-                    onDownload={handleDownloadCurrent}
-                  />
-
-                  {/* 移动端底部导航按钮 */}
-                  {isMobile && imageManager.images.length > 1 && (
-                    <div className="flex items-center justify-between mt-3 gap-2">
-                      <button
-                        onClick={goToPrevImage}
-                        disabled={imageManager.currentIndex === 0}
-                        className="flex items-center gap-1 px-3 py-2 rounded-xl bg-foreground/5 text-sm text-foreground-secondary disabled:opacity-30 active:scale-95 transition-all"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        上一张
-                      </button>
-                      <span className="text-sm text-muted-foreground">
-                        {imageManager.currentIndex + 1} / {imageManager.images.length}
-                      </span>
-                      <button
-                        onClick={goToNextImage}
-                        disabled={imageManager.currentIndex === imageManager.images.length - 1}
-                        className="flex items-center gap-1 px-3 py-2 rounded-xl bg-foreground/5 text-sm text-foreground-secondary disabled:opacity-30 active:scale-95 transition-all"
-                      >
-                        下一张
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
-      <ProgressModal progress={progress} />
-      
-      {/* 全局拖入遮罩 */}
-      <GlobalDragOverlay isVisible={isGlobalDragging} />
-      
-      {/* 二次上传文件输入 - 支持多选，不包含 capture 属性 */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
-            handleFilesSelect(e.target.files);
-            e.target.value = '';
-          }
-        }}
-      />
+      </AnimatePresence>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex items-center gap-1.5 rounded-md text-xs text-foreground-tertiary transition-colors hover:text-foreground"
+      >
+        <Keyboard className="h-3.5 w-3.5" />
+        {open ? '收起快捷键' : '键盘快捷键'}
+      </button>
+      <p className="mt-2 text-[11px] leading-relaxed text-foreground-tertiary">
+        <Credits />
+      </p>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  const isDesktop = useIsDesktop();
+  const touch = !useCanHover();
+  const { theme, toggle: toggleTheme } = useTheme();
+
+  const [settings, setSettings] = usePersistentState<WatermarkSettings>(
+    STORAGE_KEYS.settings,
+    DEFAULT_SETTINGS,
+    sanitizeSettings
+  );
+  const [exportOptions, setExportOptions] = usePersistentState<ExportOptions>(
+    STORAGE_KEYS.export,
+    DEFAULT_EXPORT,
+    sanitizeExport
+  );
+
+  const store = useImageStore({
+    onDecodeError: (names) =>
+      toast.error(`${names.length} 张图片无法读取，已跳过`, {
+        description: names.slice(0, 3).join('、') + (names.length > 3 ? ' 等' : ''),
+      }),
+  });
+  const { items, current, currentIndex, selected, remove, restore, finalize, setCurrent, toggle, selectAll, step } = store;
+  const hasImages = items.length > 0;
+
+  const [compare, setCompare] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [progress, setProgress] = useState<ExportProgress | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const [viewer, setViewer] = useState<ViewerState | null>(null);
+  const viewerToken = useRef(0);
+
+  const pickerRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const gifWarned = useRef(false);
+
+  const updateSettings = useCallback(
+    (patch: Partial<WatermarkSettings>) => setSettings((s) => ({ ...s, ...patch })),
+    [setSettings]
+  );
+  const updateExport = useCallback(
+    (patch: Partial<ExportOptions>) => setExportOptions((o) => ({ ...o, ...patch })),
+    [setExportOptions]
+  );
+  const resetSettings = () => {
+    const prev = settings;
+    setSettings(DEFAULT_SETTINGS);
+    toast('已恢复默认设置', { action: { label: '撤销', onClick: () => setSettings(prev) } });
+  };
+
+  // ---------- 添加 / 移除 ----------
+  const storeAdd = store.addFiles;
+  const addFiles = useCallback(
+    (files: FileList | File[]) => {
+      const list = Array.from(files);
+      const { added, rejected } = storeAdd(list);
+      if (rejected.length) {
+        toast.warning(`已忽略 ${rejected.length} 个不支持的文件`, {
+          description: rejected.slice(0, 3).join('、') + (rejected.length > 3 ? ' 等' : ''),
+        });
+      }
+      if (added && hasImages) toast.success(`已添加 ${added} 张图片`);
+      if (!gifWarned.current && list.some((f) => f.type === 'image/gif')) {
+        gifWarned.current = true;
+        toast('GIF 动图导出后只保留第一帧', { description: '如需保留动画，请使用专门的动图工具' });
+      }
+    },
+    [storeAdd, hasImages]
+  );
+
+  const dragging = useFileDrop(addFiles);
+  const pick = () => pickerRef.current?.click();
+  const openCamera = () => cameraRef.current?.click();
+
+  const removeImages = useCallback(
+    (ids: string[], message: string) => {
+      const removed = remove(ids);
+      if (!removed) return;
+      let undone = false;
+      toast(message, {
+        duration: 5000,
+        action: {
+          label: '撤销',
+          onClick: () => {
+            undone = true;
+            restore(removed);
+          },
+        },
+        onClose: () => {
+          if (!undone) finalize(removed);
+        },
+      });
+    },
+    [remove, restore, finalize]
+  );
+
+  const removeOne = (id: string) => {
+    const item = items.find((it) => it.id === id);
+    if (item) removeImages([id], `已移除「${shortName(item.name)}」`);
+  };
+  const clearAll = () => {
+    setDrawerOpen(false);
+    removeImages(
+      items.map((it) => it.id),
+      `已清空 ${items.length} 张图片`
+    );
+  };
+
+  // ---------- 查看 / 下载 / 导出 ----------
+  const openViewer = useCallback(async () => {
+    if (!current) return;
+    const token = ++viewerToken.current;
+    setViewer({ url: null, name: current.name, blob: null });
+    try {
+      const { blob, name } = await renderImage(current, settings, exportOptions);
+      if (token !== viewerToken.current) return;
+      // 微信长按识别不了 blob: 地址，改用 data URL
+      const url = isWeChat ? await blobToDataURL(blob) : URL.createObjectURL(blob);
+      if (token !== viewerToken.current) {
+        if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+        return;
+      }
+      setViewer({ url, name, blob });
+    } catch (e) {
+      if (token !== viewerToken.current) return;
+      setViewer(null);
+      toast.error('生成图片失败', { description: errMsg(e) });
+    }
+  }, [current, settings, exportOptions]);
+
+  const closeViewer = useCallback(() => {
+    viewerToken.current++;
+    if (viewer?.url?.startsWith('blob:')) URL.revokeObjectURL(viewer.url);
+    setViewer(null);
+  }, [viewer]);
+
+  const downloadCurrent = useCallback(async () => {
+    if (!current) return;
+    // 触屏设备走大图查看器：可长按保存或调用系统分享存入相册
+    if (touch || isWeChat) {
+      void openViewer();
+      return;
+    }
+    try {
+      await downloadImage(current, settings, exportOptions);
+    } catch (e) {
+      toast.error('下载失败', { description: errMsg(e) });
+    }
+  }, [current, touch, openViewer, settings, exportOptions]);
+
+  const exportSelected = useCallback(async () => {
+    if (abortRef.current) return;
+    if (!selected.length) {
+      toast.warning('还没有勾选要导出的图片');
+      return;
+    }
+    if (isWeChat) {
+      toast.warning('微信内无法下载文件', { description: '请点右上角「···」选择在浏览器打开后再导出' });
+      return;
+    }
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    setProgress({ phase: 'render', current: 0, total: selected.length, name: '', ratio: 0 });
+    try {
+      await exportImages(selected, settings, exportOptions, setProgress, ctrl.signal);
+      // 留一点时间展示完成动画
+      await new Promise((r) => setTimeout(r, 900));
+      toast.success(selected.length > 1 ? `已导出 ${selected.length} 张图片` : '图片已导出');
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') toast('已取消导出');
+      else toast.error('导出失败，请重试', { description: errMsg(e) });
+    } finally {
+      abortRef.current = null;
+      setProgress(null);
+    }
+  }, [selected, settings, exportOptions]);
+
+  useHotkeys(
+    {
+      prev: () => step(-1),
+      next: () => step(1),
+      remove: () => current && removeOne(current.id),
+      download: downloadCurrent,
+      exportAll: exportSelected,
+      compare: setCompare,
+    },
+    hasImages && !progress && !viewer && !drawerOpen
+  );
+
+  // ---------- 视图 ----------
+  const currentMeta = current
+    ? [current.width ? `${current.width}×${current.height}` : null, formatBytes(current.file.size)].filter(Boolean).join(' · ')
+    : '';
+
+  const listPanelProps = {
+    items,
+    currentId: store.currentId,
+    selectedCount: selected.length,
+    onToggle: toggle,
+    onSelectAll: selectAll,
+    onRemove: removeOne,
+    onClear: clearAll,
+  };
+
+  const stageProps = {
+    item: current,
+    index: currentIndex,
+    total: items.length,
+    settings,
+    compare,
+    onCompareChange: setCompare,
+    onPrev: () => step(-1),
+    onNext: () => step(1),
+    onView: openViewer,
+    onDownload: downloadCurrent,
+  };
+
+  const settingsPanel = (
+    <SettingsPanel
+      settings={settings}
+      onChange={updateSettings}
+      onReset={resetSettings}
+      exportOptions={exportOptions}
+      onExportChange={updateExport}
+    />
+  );
+
+  let view;
+  if (!hasImages) {
+    view = (
+      <m.div
+        key="landing"
+        className="flex min-h-dvh flex-col"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.18 } }}
+      >
+        <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-6">
+          <Brand />
+          <div className="flex items-center gap-1">
+            <ThemeButton theme={theme} onToggle={toggleTheme} />
+            <GithubLink />
+          </div>
+        </header>
+        <main className="flex-1">
+          <Landing onPick={pick} onCamera={openCamera} showCamera={touch} />
+        </main>
+        <footer className="pb-safe">
+          <p className="px-4 py-5 text-center text-xs text-foreground-tertiary">
+            <Credits />
+          </p>
+        </footer>
+      </m.div>
+    );
+  } else if (isDesktop) {
+    view = (
+      <m.div key="editor-desktop" className="flex h-dvh overflow-hidden" initial="hidden" animate="show" exit={{ opacity: 0 }}>
+        <m.aside variants={fromLeft} className="flex w-64 shrink-0 flex-col border-r border-border bg-surface xl:w-72">
+          <div className="flex h-16 shrink-0 items-center border-b border-border px-4">
+            <Brand />
+          </div>
+          <ImageListPanel {...listPanelProps} layoutKey="sidebar" onSelect={setCurrent} onAdd={pick} />
+          <SidebarFooter />
+        </m.aside>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <m.header
+            variants={fromTop}
+            className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-surface/70 px-5 backdrop-blur-xl"
+          >
+            <div className="min-w-0 flex-1">
+              <AnimatePresence mode="wait" initial={false}>
+                <m.div
+                  key={current?.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <p className="truncate text-sm font-semibold text-foreground">{current?.name}</p>
+                  <p className="tabular truncate text-xs text-foreground-tertiary">
+                    {currentMeta} · 第 {currentIndex + 1} / {items.length} 张
+                  </p>
+                </m.div>
+              </AnimatePresence>
+            </div>
+            <ThemeButton theme={theme} onToggle={toggleTheme} />
+            <GithubLink />
+            <span className="mx-1 h-6 w-px bg-border" />
+            <Button variant="outline" onClick={downloadCurrent} disabled={!current} title={`下载当前（${MOD}+S）`}>
+              <Download className="h-4 w-4" />
+              下载当前
+            </Button>
+            <Button
+              variant="primary"
+              onClick={exportSelected}
+              disabled={!selected.length || Boolean(progress)}
+              title={`导出所有勾选的图片（${MOD}+Shift+S）`}
+            >
+              <FileArchive className="h-4 w-4" />
+              {selected.length > 1 ? '导出所选' : '导出'}
+              <CountBadge value={selected.length} />
+            </Button>
+          </m.header>
+
+          <div className="flex min-h-0 flex-1 gap-5 p-5">
+            <m.div variants={zoomIn} className="min-w-0 flex-1">
+              <PreviewStage {...stageProps} swipe={false} className="h-full" />
+            </m.div>
+            <m.aside
+              variants={fromRight}
+              aria-label="水印设置"
+              className="w-[340px] shrink-0 overflow-y-auto overscroll-contain rounded-3xl border border-border bg-surface shadow-card xl:w-[360px]"
+            >
+              {settingsPanel}
+            </m.aside>
+          </div>
+        </div>
+      </m.div>
+    );
+  } else {
+    view = (
+      <m.div
+        key="editor-mobile"
+        className="min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-1 border-b border-border bg-surface/85 px-2 backdrop-blur-xl">
+          <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(true)} aria-label="打开图片列表" className="relative">
+            <Menu className="h-5 w-5" />
+            <span className="tabular absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-fg">
+              {items.length}
+            </span>
+          </Button>
+          <div className="min-w-0 flex-1 px-1">
+            <p className="truncate text-sm font-semibold text-foreground">{current?.name}</p>
+            <p className="tabular truncate text-[11px] text-foreground-tertiary">{currentMeta}</p>
+          </div>
+          <ThemeButton theme={theme} onToggle={toggleTheme} />
+          <Button variant="ghost" size="icon" onClick={pick} aria-label="添加图片">
+            <Plus className="h-5 w-5" />
+          </Button>
+        </header>
+
+        <div className="sticky top-14 z-20 bg-background/95 px-3 pt-3 backdrop-blur">
+          <PreviewStage {...stageProps} swipe className="h-[min(46vh,440px)]" />
+        </div>
+        <ThumbStrip items={items} currentId={store.currentId} onSelect={setCurrent} onAdd={pick} />
+
+        <m.div
+          className="mx-3 overflow-hidden rounded-3xl border border-border bg-surface shadow-card"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...spring, delay: 0.08 }}
+        >
+          {settingsPanel}
+        </m.div>
+        <p className="px-4 py-6 text-center text-[11px] text-foreground-tertiary">
+          <Credits />
+        </p>
+
+        <m.div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/90 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl"
+          initial={{ y: 80 }}
+          animate={{ y: 0 }}
+          transition={{ ...spring, delay: 0.12 }}
+        >
+          <div className="flex gap-2">
+            <Button variant="outline" size="lg" className="flex-1 px-3" onClick={downloadCurrent} disabled={!current}>
+              <Download className="h-5 w-5" />
+              保存当前
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              className="flex-[1.4] px-3"
+              onClick={exportSelected}
+              disabled={!selected.length || Boolean(progress)}
+            >
+              <FileArchive className="h-5 w-5" />
+              导出所选
+              <CountBadge value={selected.length} />
+            </Button>
+          </div>
+        </m.div>
+
+        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-border pl-4 pr-2">
+            <Brand compact />
+            <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} aria-label="关闭">
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+          <ImageListPanel
+            {...listPanelProps}
+            layoutKey="drawer"
+            onSelect={(id) => {
+              setCurrent(id);
+              setDrawerOpen(false);
+            }}
+            onAdd={() => {
+              setDrawerOpen(false);
+              pick();
+            }}
+          />
+        </Drawer>
+      </m.div>
+    );
+  }
+
+  return (
+    <LazyMotion features={loadMotionFeatures} strict>
+      <MotionConfig reducedMotion="user">
+        {isWeChat && <WeChatTip />}
+        <AnimatePresence mode="wait" initial={false}>
+          {view}
+        </AnimatePresence>
+
+        <input
+          ref={pickerRef}
+          type="file"
+          // 移动端用 image/* 才会直接打开相册
+          accept={touch ? 'image/*' : ACCEPT_TYPES}
+          multiple
+          hidden
+          onChange={(e) => {
+            if (e.target.files?.length) addFiles(e.target.files);
+            e.target.value = '';
+          }}
+        />
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={(e) => {
+            if (e.target.files?.length) addFiles(e.target.files);
+            e.target.value = '';
+          }}
+        />
+
+        <DropOverlay visible={dragging} />
+        <ExportDialog progress={progress} onCancel={() => abortRef.current?.abort()} />
+        <Viewer
+          state={viewer}
+          onClose={closeViewer}
+          onDownload={() => viewer?.blob && saveAs(viewer.blob, viewer.name)}
+          touch={touch}
+          wechat={isWeChat}
+        />
+        <Toaster />
+      </MotionConfig>
+    </LazyMotion>
+  );
+}

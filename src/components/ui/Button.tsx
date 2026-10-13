@@ -1,50 +1,47 @@
-import React from 'react';
+import { m, type HTMLMotionProps } from 'motion/react';
 import { cn } from '../../lib/utils';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger';
+type Size = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm';
+
+export interface ButtonProps extends HTMLMotionProps<'button'> {
+  variant?: Variant;
+  size?: Size;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-xl font-medium',
-          'transition-all duration-200 ease-smooth',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20',
-          'disabled:pointer-events-none disabled:opacity-40',
-          // 移动端触摸优化
-          'active:scale-95 touch-manipulation',
-          {
-            // 主按钮 - 深蓝强调色
-            'bg-primary text-white shadow-subtle hover:bg-primary-800 hover:shadow-card':
-              variant === 'primary',
-            // 次要按钮 - 浅灰背景
-            'bg-foreground/5 text-foreground hover:bg-foreground/10':
-              variant === 'secondary',
-            // 幽灵按钮 - 透明背景
-            'text-muted-foreground hover:bg-foreground/5 hover:text-foreground':
-              variant === 'ghost',
-            // 描边按钮 - 极细边框
-            'border border-border bg-transparent text-foreground hover:border-border-hover hover:bg-foreground/5':
-              variant === 'outline',
-          },
-          {
-            // 尺寸 - 移动端增大触摸区域
-            'h-9 sm:h-8 px-3.5 sm:px-3 text-sm sm:text-xs': size === 'sm',
-            'h-11 sm:h-10 px-5 sm:px-4 text-sm': size === 'md',
-            'h-12 sm:h-12 px-6 text-base': size === 'lg',
-            'h-11 w-11 sm:h-10 sm:w-10 p-0': size === 'icon',
-          },
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
+const variants: Record<Variant, string> = {
+  primary:
+    'bg-primary text-primary-fg shadow-[0_1px_2px_rgb(15_23_42/0.12),inset_0_1px_0_rgb(255_255_255/0.12)] hover:brightness-110',
+  secondary: 'bg-surface-2 text-foreground hover:bg-border/70',
+  ghost: 'text-foreground-secondary hover:bg-surface-2 hover:text-foreground',
+  outline: 'border border-border bg-surface text-foreground hover:border-border-strong hover:bg-surface-2',
+  danger: 'text-foreground-secondary hover:bg-danger/10 hover:text-danger',
+};
 
-Button.displayName = 'Button';
+const sizes: Record<Size, string> = {
+  sm: 'h-8 gap-1.5 rounded-lg px-3 text-xs',
+  md: 'h-10 gap-2 rounded-xl px-4 text-sm',
+  lg: 'h-12 gap-2 rounded-2xl px-6 text-base',
+  icon: 'h-10 w-10 rounded-xl',
+  'icon-sm': 'h-8 w-8 rounded-lg',
+};
+
+export function Button({ className, variant = 'secondary', size = 'md', type = 'button', disabled, ...props }: ButtonProps) {
+  return (
+    <m.button
+      type={type}
+      disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.96 }}
+      transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+      className={cn(
+        'inline-flex shrink-0 select-none items-center justify-center whitespace-nowrap font-medium',
+        'transition-[background-color,border-color,color,box-shadow,filter,opacity] duration-200',
+        'disabled:pointer-events-none disabled:opacity-40',
+        variants[variant],
+        sizes[size],
+        className
+      )}
+      {...props}
+    />
+  );
+}

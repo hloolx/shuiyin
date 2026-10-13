@@ -1,56 +1,50 @@
-import React, { useCallback, useRef } from 'react';
-import { cn } from '../../lib/utils';
+import { useId, type CSSProperties, type ReactNode } from 'react';
 
-export interface SliderProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  value?: number;
-  onValueChange?: (value: number) => void;
+interface SliderProps {
+  label: ReactNode;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+  format?: (value: number) => string;
+  /** 填充起点，默认 min；双向滑块（如角度）传 0 从中间填充 */
+  origin?: number;
 }
 
-export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
-  ({ className, value, onValueChange, onChange, ...props }, ref) => {
-    const lastVibrateRef = useRef(0);
+export function Slider({ label, value, min, max, step, onChange, format = String, origin = min }: SliderProps) {
+  const id = useId();
+  const pct = ((value - min) / (max - min)) * 100;
+  const originPct = ((origin - min) / (max - min)) * 100;
+  const style = {
+    '--fill-from': `${Math.min(pct, originPct)}%`,
+    '--fill-to': `${Math.max(pct, originPct)}%`,
+  } as CSSProperties;
 
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = parseFloat(e.target.value);
-      onValueChange?.(newValue);
-      onChange?.(e);
-
-      // 移动端触觉反馈（每 100ms 最多触发一次）
-      const now = Date.now();
-      if (navigator.vibrate && now - lastVibrateRef.current > 100) {
-        navigator.vibrate(5);
-        lastVibrateRef.current = now;
-      }
-    }, [onValueChange, onChange]);
-
-    return (
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <label htmlFor={id} className="text-sm text-foreground-secondary">
+          {label}
+        </label>
+        <output
+          htmlFor={id}
+          className="tabular min-w-[3.25rem] rounded-md bg-surface-2 px-1.5 py-0.5 text-center text-xs font-medium text-foreground"
+        >
+          {format(value)}
+        </output>
+      </div>
       <input
-        ref={ref}
+        id={id}
         type="range"
+        className="range mt-1"
+        min={min}
+        max={max}
+        step={step}
         value={value}
-        onChange={handleChange}
-        className={cn(
-          // 基础样式
-          'h-3 sm:h-2 w-full cursor-pointer appearance-none rounded-full bg-foreground/10',
-          'transition-all duration-200 touch-none',
-          // Webkit 滑块样式 - 移动端增大触摸区域
-          '[&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 sm:[&::-webkit-slider-thumb]:h-4 sm:[&::-webkit-slider-thumb]:w-4',
-          '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary',
-          '[&::-webkit-slider-thumb]:shadow-subtle [&::-webkit-slider-thumb]:transition-all',
-          '[&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:hover:shadow-card',
-          '[&::-webkit-slider-thumb]:active:scale-95',
-          // Mozilla 滑块样式 - 移动端增大
-          '[&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 sm:[&::-moz-range-thumb]:h-4 sm:[&::-moz-range-thumb]:w-4',
-          '[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0',
-          '[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:shadow-subtle [&::-moz-range-thumb]:transition-all',
-          // 焦点样式
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20',
-          className
-        )}
-        {...props}
+        style={style}
+        onChange={(e) => onChange(Number(e.target.value))}
       />
-    );
-  }
-);
-
-Slider.displayName = 'Slider';
+    </div>
+  );
+}
